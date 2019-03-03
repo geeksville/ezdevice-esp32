@@ -2,6 +2,8 @@
 
 You probably don't want it yet.
 
+![photo of cases](/doc/cases.jpg)
+
 ## Build instructions
 
 This project uses the simple PlatformIO build system. You can use the IDE, but for brevity
