@@ -1,8 +1,27 @@
-# This project is in alpha-test 
+# This project is in alpha-test
 
 You probably don't want it yet.
 
-# Supported hardware notes
+## Build instructions
+
+This project uses the simple PlatformIO build system. You can use the IDE, but for brevity
+in these instructions I describe use of their command line tool.
+
+1. Purchase one of the inexpensive ESP32-CAM modules from asia (see above).
+2. Install [PlatformIO](https://platformio.org/).
+3. Download this git repo and cd into it.
+4. pio run -t upload (This command will fetch dependencies, build the project and install it on the board via USB)
+
+The first time you run your device you'll need to use an Android or iOS app to give it
+access to your wifi network. See [instructions here](https://github.com/geeksville/AutoWifi/blob/master/README.md).
+
+## Master repository
+
+The master repository for this project is [located here](https://github.com/geeksville/ezdevice-esp32).
+
+# Supported hardware
+
+This project works on many different ESP32 based boards mostly from [Lilygo](http://www.lilygo.cn/). Support for cameras is not yet included in this repo, but will be released in a couple of weeks.
 
 ## T-Gallery
 
