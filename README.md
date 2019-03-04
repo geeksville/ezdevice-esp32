@@ -1,6 +1,6 @@
 # This project is in alpha-test
 
-You probably don't want it yet.
+You probably don't want it yet.  But if you are trying to make this work (i.e. I've sent you a note), please post in the [group Gitter chat](https://gitter.im/ezdevice/esp32-client) if you have any questions.
 
 ![photo of cases](/doc/cases.jpg)
 
