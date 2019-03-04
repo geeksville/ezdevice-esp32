@@ -1,6 +1,6 @@
 # This project is in alpha-test
 
-You probably don't want it yet.  But if you are trying to make this work (i.e. I've sent you a note), please post in the [group Gitter chat](https://gitter.im/ezdevice/esp32-client) if you have any questions.
+You probably don't want it yet.  But if you are trying to make this work (i.e. I've sent you a note), please post in the group chat: [![Gitter](https://badges.gitter.im/ezdevice/esp32-client.svg)](https://gitter.im/ezdevice/esp32-client?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ![photo of cases](/doc/cases.jpg)
 
@@ -9,7 +9,7 @@ You probably don't want it yet.  But if you are trying to make this work (i.e. I
 This project uses the simple PlatformIO build system. You can use the IDE, but for brevity
 in these instructions I describe use of their command line tool.
 
-1. Purchase one of the inexpensive ESP32-CAM modules from asia (see above).
+1. Purchase one of the TTGO boards (see below for options).
 2. Install [PlatformIO](https://platformio.org/).
 3. Download this git repo and cd into it.
 4. pio run -t upload (This command will fetch dependencies, build the project and install it on the board via USB)
