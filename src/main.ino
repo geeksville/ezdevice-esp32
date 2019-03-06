@@ -23,7 +23,6 @@
 #include <PubSubClient.h>
 #include <HTTPClient.h>
 #include <JPEGDecoder.h>
-#include <AutoWifi.h>
 #include <ESP32-AutoUpdate.h>
 #include <Fonts/FreeSans9pt7b.h>
 #include <esp_sleep.h>
@@ -35,6 +34,7 @@
 #include "FS.h"
 #include "SPIFFS.h"
 #include "buildnum.h"
+#include <AutoConnect.h>
 
 // #include "wifikeys.h"
 #include "board.h"
@@ -46,7 +46,9 @@
 
 void jpegRender(int xpos, int ypos);
 
-AutoWifi a;
+WebServer webServer;
+AutoConnectConfig portalConfig;
+AutoConnect portal(webServer);
 
 // We construct our filename to be different for each board type
 AutoUpdate update(String("https://") + xstr(BUCKETNAME) + ".s3.amazonaws.com/" + "firmware-" + JOYBOARD_TYPE);
@@ -314,6 +316,7 @@ void turnOnDisplay()
 }
 
 char clientId[16];
+const char *shortId;
 
 static char *base36enc(uint64_t value)
 {
@@ -345,6 +348,8 @@ void initClientId()
              (uint32_t)((chipid >> 24) & 0xff),
              (uint32_t)((chipid >> 32) & 0xff),
              (uint32_t)((chipid >> 40) & 0xff));
+
+    shortId = clientId + 2 + 4 * 2; // Offset into the longer string for a short suffix from the macaddr
 #else
     // base36 only saved two characters, not worth it
     char *base36 = base36enc(chipid);
@@ -580,7 +585,7 @@ bool reconnect()
     // we send status offline as our will (as a persistent message)
     if (mqtt.connect(clientId, "joyclient", "apes4cats", getTopic("status"), 1, true, "offline"))
     {
-        Serial.println("Connected to MQTT server");
+        Serial.printf("Connected to MQTT server, wifi=%s", WiFi.SSID().c_str());
         delaySleep(); // we just made some forward progress (note, we don't do this just because we _tried_ to connect)
 
         static char subsStr[64]; /* We keep this static because the mqtt lib
@@ -596,7 +601,7 @@ bool reconnect()
             netinfo: the last network this device connected to for debugging (sent from device in the status message)
             */
         char statusbuf[64];
-        snprintf(statusbuf, sizeof(statusbuf), "online\n%s\n%d\n%s", VERSION_STRING, VERSION_NUM, a.getSSID().c_str());
+        snprintf(statusbuf, sizeof(statusbuf), "online\n%s\n%d\n%s", VERSION_STRING, VERSION_NUM, WiFi.SSID().c_str());
         publish("status", statusbuf, true);
         // do this _after_ subscribe to ensure we don't miss messages, it is important that this message marked as retained, so that if the server reboots (during development mainly) it sets the correct state when it comes up
 
@@ -691,6 +696,13 @@ void dispTest()
     disp.setRotation(rotation); // restore
 }
 
+bool startCP(IPAddress ip)
+{
+    Serial.println("Config portal started, IP:" + WiFi.localIP().toString());
+    showBootScreen(String("Please config wifi at ") + portalConfig.apid);
+    return true;
+}
+
 void setup()
 {
 
@@ -717,8 +729,11 @@ void setup()
 
 #ifdef FACTORYRESET_BUTTON
     pinMode(FACTORYRESET_BUTTON, INPUT);
-    if (!digitalRead(FACTORYRESET_BUTTON)) // 1 means not pressed
-        a.resetProvisioning();
+    if (!digitalRead(FACTORYRESET_BUTTON) && !wakeButtons)
+    { // 1 means not pressed, but only if we were not waking from sleep for that press (i.e. we also had the reset button pressed)
+        Serial.println("FACTORY RESET!");
+        portalConfig.immediateStart = true; // show our connection webapp
+    }
 #endif
 
 #ifdef PANICUPDATE_BUTTON
@@ -759,16 +774,23 @@ void setup()
     Serial.println("End display test");
 #endif
 
-    if (!a.isProvisioned())
-    {
-        // we don't have wifi settings so show boot screen immediately
-        // and then fall through into the wifi setup
-        showBootScreen("Waiting for wifi config...");
-    }
+    // portalConfig.immediateStart = true; // only set in factory reset mode
+    portalConfig.apid = String("Ezdevice-") + shortId;
+    portalConfig.psk = ""; // require no password
+    portalConfig.title = "EZDevice";
+    portalConfig.hostName = String("ezdev") + shortId;
+    // portalConfig.autoRise = false; // We only raise it when the user presses a button
+    // portalConfig.autoReconnect = true;
+    portalConfig.portalTimeout = 10 * 60 * 1000; // If the user fails to setup in this time, go back to deep sleep
+    portal.onDetect(startCP);
+    //portalConfig.homeUri = "/_ac/config"; // doesn't work
+    //portalConfig.bootUri = AC_ONBOOTURI_HOME;
+    portal.config(portalConfig);
 
-    // Start trying to connect to wifi
-    a.startWifi();
-    delaySleep(); // we just got connected to wifi, give time for something interesting to happen
+    // We try to connect to the regular wifi for an hour (essentially forever - because we will enter deep-sleep before then)
+    portal.begin(NULL, NULL, 60 * 60 * 1000);
+
+    delaySleep(); // we just got connected to wifi?, give time for something interesting to happen
 
 #ifdef DEEPSLEEP_CHARGEWAKE
     // FIXME count wakes properly
@@ -789,24 +811,7 @@ void setup()
     }
 #endif
 
-    // we try to wait up to 5 seconds before deciding we need a boot screen - to tell the user something is wrong
-    uint32_t startMsec = millis();
-    bool didShowWifiMessage = false;
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(10);
-        if (millis() - startMsec >= 5000 && !didShowWifiMessage)
-        {
-            didShowWifiMessage = true; // Only show the message once to keep eink from flickering
-            showBootScreen(String("Looking for ") + a.getSSID());
-        }
-
-        perhapsSleep(); // If we can't find wifi in time, go back to deep sleep
-        blinkStatus();
-    }
-    Serial.printf("Time required for wifi connect: %lu\n", millis() - startMsec);
-
-    // If the user held down the panic update button (and is still holding it down, see if we can fetch an update from the server)
+// If the user held down the panic update button (and is still holding it down, see if we can fetch an update from the server)
 #ifdef PANICUPDATE_BUTTON
     bool stillWantUpdate = !digitalRead(PANICUPDATE_BUTTON);
     if (initialUpdateCheck && stillWantUpdate)
@@ -883,13 +888,9 @@ void buttonCheck()
     isFirstCheck = false; // we only check wake buttons on first call of this function
 }
 
-void loop()
+// Our network handler has requested the main thread to show an image
+void showNewImages()
 {
-    unsigned long currentMillis = millis();
-    static bool firstAttempt = true;
-
-    perhapsSleep();
-
     if (haveNewImage)
     {
         haveNewImage = false;
@@ -912,11 +913,22 @@ void loop()
             showingTempImage = false;
         }
     }
+}
+
+void loop()
+{
+    static uint32_t startMsec = millis();
+    unsigned long currentMillis = millis();
+    static bool firstAttempt = true;
+
+    portal.handleClient();
+
+    perhapsSleep();
+
+    showNewImages();
 
     if (mqtt.connected()) // We only check for buttons when we are connected and subscribed for responses
         buttonCheck();
-
-    //unsigned long currentMillis = millis();
 
     if (currentMillis - previousMillis >= interval)
     {
@@ -924,15 +936,15 @@ void loop()
         interval = 500;
         blinkStatus();
 
-        //Note: we only check for update requests occasionally so that the MQTT server has a chance to receive the ack that we received the request
-        if (updateAtMillis && updateAtMillis >= currentMillis)
-        {
-            updateAtMillis = 0;
-            update.update(true); // Force an update to this revision
-        }
-
         if ((WiFi.status() == WL_CONNECTED))
         {
+            //Note: we only check for update requests occasionally so that the MQTT server has a chance to receive the ack that we received the request
+            if (updateAtMillis && updateAtMillis >= currentMillis)
+            {
+                updateAtMillis = 0;
+                update.update(true); // Force an update to this revision
+            }
+
             if (!mqtt.connected())
             { // If our first connection fails show a message
                 if (!reconnect() && firstAttempt)
@@ -943,11 +955,21 @@ void loop()
                 else
                 {
                     Serial.printf("Time required for server connect: %lu\n", millis() - previousMillis);
+                    portal.end(); // No need to keep burning CPU for our setup portal
                 }
             }
         }
         else
-            a.reconnect();
+        {
+            // we try to wait up to 5 seconds before deciding we need a boot screen - to tell the user something is wrong
+            static bool didShowWifiMessage = false;
+
+            if (millis() - startMsec >= 5000 && !didShowWifiMessage)
+            {
+                didShowWifiMessage = true; // Only show the message once to keep eink from flickering
+                showBootScreen(String("Looking for ") + WiFi.SSID());
+            }
+        }
     }
 
     mqtt.loop();

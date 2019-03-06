@@ -14,9 +14,17 @@ in these instructions I describe use of their command line tool.
 3. Download this git repo and cd into it.
 4. pio run -t upload (This command will fetch dependencies, build the project and install it on the board via USB)
 
-The first time you run your device you'll need to use an Android or iOS app to give it
-access to your wifi network. See [instructions here](https://github.com/geeksville/AutoWifi/blob/master/README.md).
+The first time you run your device you'll need to connect to the "EZDevice-????" wifi network.  This device uses a small internal webserver to let you give the necessary information it needs to connect to _your_ wifi network.  After the device is connected to your wifi, it should begin fetching sample images from our servers.  You can now go to the QR code printed on the back of your unit to login, set preferences and control/customize your device.
 
+When setting up wifi on your device your phone should look approximately like this:
+
+![screen](/doc/screen1.png)
+
+![screen](/doc/screen2.png)
+
+![screen](/doc/screen3.png)
+
+![screen](/doc/screen4.png)
 ## Master repository
 
 The master repository for this project is [located here](https://github.com/geeksville/ezdevice-esp32).
