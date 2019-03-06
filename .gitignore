@@ -5,3 +5,4 @@
 .gcc-*.json
 private-env.sh
 keys
+eeprom.bin

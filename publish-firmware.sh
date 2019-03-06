@@ -5,8 +5,10 @@ if [ $# -lt 1 ]; then
   exit 2
 fi
 
+BUCKETNAME=joyfirmware
+
 if [ -z "$BUCKETNAME" ]; then
-  echo "Bucketname not set in environment"
+  echo "ERROR: Bucketname not set in environment"
   exit 1
 fi
 

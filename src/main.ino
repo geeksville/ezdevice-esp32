@@ -724,6 +724,8 @@ void setup()
 
     initClientId();
 
+    dump_partitions();
+
     delaySleep(); // Give a few seconds to try and get an internet connection
     Serial.println("joining wifi");
 
@@ -791,7 +793,7 @@ void setup()
     portalConfig.title = "EZDevice";
     portalConfig.hostName = String("ezdev") + shortId;
     // portalConfig.autoRise = true;
-    // portalConfig.autoReconnect = true;
+    // portalConfig.autoReconnect = true; we don't want this because the esp32 will have already tried to connect to our network
     portalConfig.portalTimeout = 10 * 60 * 1000; // If the user fails to setup in this time, go back to deep sleep
     portal.onDetect(startCP);
     //portalConfig.homeUri = "/_ac/config"; // doesn't work
