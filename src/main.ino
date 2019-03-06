@@ -727,15 +727,6 @@ void setup()
     delaySleep(); // Give a few seconds to try and get an internet connection
     Serial.println("joining wifi");
 
-#ifdef FACTORYRESET_BUTTON
-    pinMode(FACTORYRESET_BUTTON, INPUT);
-    if (!digitalRead(FACTORYRESET_BUTTON) && !wakeButtons)
-    { // 1 means not pressed, but only if we were not waking from sleep for that press (i.e. we also had the reset button pressed)
-        Serial.println("FACTORY RESET!");
-        portalConfig.immediateStart = true; // show our connection webapp
-    }
-#endif
-
 #ifdef PANICUPDATE_BUTTON
     pinMode(PANICUPDATE_BUTTON, INPUT);
     bool initialUpdateCheck = !digitalRead(PANICUPDATE_BUTTON); // 1 means not pressed
@@ -774,12 +765,32 @@ void setup()
     Serial.println("End display test");
 #endif
 
-    // portalConfig.immediateStart = true; // only set in factory reset mode
+    AutoConnectCredential ac(portalConfig.boundaryOffset);
+
+#ifdef FACTORYRESET_BUTTON
+    pinMode(FACTORYRESET_BUTTON, INPUT);
+    if (!digitalRead(FACTORYRESET_BUTTON) && !wakeButtons)
+    { // 1 means not pressed, but only if we were not waking from sleep for that press (i.e. we also had the reset button pressed)
+        Serial.println("FACTORY RESET!");
+        portalConfig.immediateStart = true; // show our connection webapp
+        ac.del("geeksville");               // Don't accidentally ship devices with my home network SSID
+    }
+#endif
+
+    for (int8_t i = 0; i < ac.entries(); i++)
+    {
+        struct station_config entry;
+        ac.load(i, &entry);
+        Serial.printf("Saved SSID: %s\n", entry.ssid);
+    }
+
+    if (ac.entries() == 0)
+        portalConfig.immediateStart = true; // If there are no saved wifi networks, we must show the portal
     portalConfig.apid = String("Ezdevice-") + shortId;
     portalConfig.psk = ""; // require no password
     portalConfig.title = "EZDevice";
     portalConfig.hostName = String("ezdev") + shortId;
-    // portalConfig.autoRise = false; // We only raise it when the user presses a button
+    // portalConfig.autoRise = true;
     // portalConfig.autoReconnect = true;
     portalConfig.portalTimeout = 10 * 60 * 1000; // If the user fails to setup in this time, go back to deep sleep
     portal.onDetect(startCP);
