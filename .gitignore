@@ -6,3 +6,4 @@
 private-env.sh
 keys
 eeprom.bin
+nvs.bin

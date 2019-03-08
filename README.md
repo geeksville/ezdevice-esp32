@@ -1,6 +1,6 @@
 # This project is in alpha-test
 
-You probably don't want it yet.  But if you are trying to make this work (i.e. I've sent you a note), please post in the group chat: [![Gitter](https://badges.gitter.im/ezdevice/esp32-client.svg)](https://gitter.im/ezdevice/esp32-client?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+You probably don't want it yet. But if you are trying to make this work (i.e. I've sent you a note), please post in the group chat: [![Gitter](https://badges.gitter.im/ezdevice/esp32-client.svg)](https://gitter.im/ezdevice/esp32-client?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ![photo of cases](/doc/cases.jpg)
 
@@ -14,7 +14,7 @@ in these instructions I describe use of their command line tool.
 3. Download this git repo and cd into it.
 4. pio run -t upload (This command will fetch dependencies, build the project and install it on the board via USB)
 
-The first time you run your device you'll need to connect to the "EZDevice-????" wifi network.  This device uses a small internal webserver to let you give the necessary information it needs to connect to _your_ wifi network.  After the device is connected to your wifi, it should begin fetching sample images from our servers.  You can now go to the QR code printed on the back of your unit to login, set preferences and control/customize your device.
+The first time you run your device you'll need to connect to the "EZDevice-????" wifi network. This device uses a small internal webserver to let you give the necessary information it needs to connect to _your_ wifi network. After the device is connected to your wifi, it should begin fetching sample images from our servers. You can now go to the QR code printed on the back of your unit to login, set preferences and control/customize your device.
 
 When setting up wifi on your device your phone should look approximately like this:
 
@@ -25,6 +25,7 @@ When setting up wifi on your device your phone should look approximately like th
 ![screen](/doc/screen3.png)
 
 ![screen](/doc/screen4.png)
+
 ## Master repository
 
 The master repository for this project is [located here](https://github.com/geeksville/ezdevice-esp32).
@@ -55,9 +56,16 @@ deep sleep works well on this board, but the sleep current draw is 10mA due to s
 
 ## epaper TTGO T5_V2.3 250x122 2.13"
 
+board type L in my arch
 Works well
 GDE0213B1 display
 LED on IO19
+
+## epaper TTGO T5_V1.6 red/black eink 2.9" 296x128
+
+Board type K in my arch
+GDEW029Z10
+display size 66.89 × 29.05 (outer dimension 79.0 × 36.7)
 
 ## epaper TTGO T5s V1.9 264x176 2.7"
 

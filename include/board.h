@@ -1,9 +1,11 @@
 #pragma once
 
 #ifndef AUTOBUILD // If we are being invoked in a release script make sure these settings come from there
-// #define BOARD_TTGO_T4
+//#define BOARD_TTGO_T4
 // #define BOARD_TTGO_T5s
-#define BOARD_TTGO_T5_23
+// #define BOARD_TTGO_T5_23 // with a 2.13" screen
+#define BOARD_TTGO_T5_16 // with a 2.9" screen
+
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
 #endif
 
@@ -151,18 +153,7 @@
 
 // assume eink
 #define JOYBOARD_TYPE 'L'
-
-// #define DISP_ADAFRUIT // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
-// #define DISP_COLOR // If defined we assume color display, else assumed mono
-
-// Note: if not using DEEPSLEEP_CHARGE
-#define DEEPSLEEP_INTERVAL ((24 / 2) * 60 * 60 * 1000ULL) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
-#define DEEPSLEEP_IDLE (20 * 1000)                        // This this period passes without any activity (button press or message from server), go to sleep
-
-// This board does have a busted charge controller, but in the interest of maximum battery life I'm letting the controller kill has after we've been in deep sleep for five minutes
-// #define DEEPSLEEP_CHARGEWAKE (25 * 1000)         // define this if there is a busted charge controller on the board and we need to wake periodically to keep it from killing us.
-
-#define STATUS_LED 19 // This board has a GPIO hooked to an LED, high is LED on
+#define BOARD_TTGO_T5 // Most T5 setup is the same
 
 // Button defs for this board
 #define NUM_BUTTONS 1
@@ -178,6 +169,49 @@
 
 #define FACTORYRESET_BUTTON 39 // one
 // #define PANICUPDATE_BUTTON 38  // two
+
+#define STATUS_LED 19 // This board has a GPIO hooked to an LED, high is LED on
+
+#elif defined(BOARD_TTGO_T5_16)
+
+// assume eink
+#define JOYBOARD_TYPE 'K'
+#define BOARD_TTGO_T5 // Most T5 setup is the same
+
+// Button defs for this board
+#define NUM_BUTTONS 3
+
+// from left to right they are RESET, 38 37 39
+// So I map these so that button "one" is the right most, then two is middle, then three is left
+// I chose this odd mapping to keep the users finger away from the reset button
+// This mapping is definitely correct - I need to fix my plastic buttons to not double press
+#define BUTTON_GPIOS \
+  {                  \
+    38, 37, 39       \
+  }
+
+#define FACTORYRESET_BUTTON 38 // one
+#define PANICUPDATE_BUTTON 37  // two
+
+#define STATUS_LED 22 // This board has a GPIO hooked to an LED, high is LED on
+
+#else
+
+#error board type not set
+
+#endif
+
+#ifdef BOARD_TTGO_T5
+
+// #define DISP_ADAFRUIT // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
+// #define DISP_COLOR // If defined we assume color display, else assumed mono
+
+// Note: if not using DEEPSLEEP_CHARGE
+#define DEEPSLEEP_INTERVAL ((24 / 2) * 60 * 60 * 1000ULL) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
+#define DEEPSLEEP_IDLE (20 * 1000)                        // This this period passes without any activity (button press or message from server), go to sleep
+
+// This board does have a busted charge controller, but in the interest of maximum battery life I'm letting the controller kill has after we've been in deep sleep for five minutes
+// #define DEEPSLEEP_CHARGEWAKE (25 * 1000)         // define this if there is a busted charge controller on the board and we need to wake periodically to keep it from killing us.
 
 #define DISPLAY_ROTATION 3           // 0 & 2 Portrait. 1 & 3 landscape
 #define DISPLAY_UPDATE disp.update() // command needed to flush the display to the actual hardware
@@ -206,9 +240,5 @@
 #define EPD_CLK 18
 #define EPD_MISO -1 // unused
 #define EPD_DC 17
-
-#else
-
-#error board type not set
 
 #endif

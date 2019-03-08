@@ -129,6 +129,11 @@ GxGDEW027C44 disp(epaperIO, EPD_RESET, EPD_BUSY);
 GxGDE0213B1 disp(epaperIO, EPD_RESET, EPD_BUSY);
 #endif
 
+#ifdef BOARD_TTGO_T5_16
+#include <GxGDEW029Z10/GxGDEW029Z10.h>
+GxGDEW029Z10 disp(epaperIO, EPD_RESET, EPD_BUSY);
+#endif
+
 #else
 #error no display defined
 #endif
