@@ -1,10 +1,11 @@
 #pragma once
 
 #ifndef AUTOBUILD // If we are being invoked in a release script make sure these settings come from there
-//#define BOARD_TTGO_T4
+#define BOARD_TTGO_T4
 // #define BOARD_TTGO_T5s
 // #define BOARD_TTGO_T5_23 // with a 2.13" screen
-#define BOARD_TTGO_T5_16 // with a 2.9" screen
+// #define BOARD_TTGO_T5_16_RED // with a red-black 2.9" screen
+// #define BOARD_TTGO_T5_16_YELLOW // with a red-black 2.9" screen
 
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
 #endif
@@ -19,7 +20,7 @@
 
 // Deep sleep works on this board, but the power manager will shut us down automatically after a while (I think - still TBD)
 #define DEEPSLEEP_INTERVAL (365 * 24 * 60 * 60 * 1000ULL) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
-#define DEEPSLEEP_IDLE (120 * 1000)                       // This this period passes without any activity (button press or message from server), go to sleep
+#define DEEPSLEEP_IDLE (50 * 1000)                        // This this period passes without any activity (button press or message from server), go to sleep
 
 #define TFT_CS 27 // If undefined we assume no TFT screen
 #define TFT_DC 26
@@ -172,10 +173,23 @@
 
 #define STATUS_LED 19 // This board has a GPIO hooked to an LED, high is LED on
 
-#elif defined(BOARD_TTGO_T5_16)
+#elif defined(BOARD_TTGO_T5_16_RED)
 
-// assume eink
 #define JOYBOARD_TYPE 'K'
+#define BOARD_TTGO_T5_16
+
+#elif defined(BOARD_TTGO_T5_16_YELLOW)
+
+#define JOYBOARD_TYPE 'Y'
+#define BOARD_TTGO_T5_16
+
+#else
+
+#error board type not set
+
+#endif
+
+#ifdef BOARD_TTGO_T5_16
 #define BOARD_TTGO_T5 // Most T5 setup is the same
 
 // Button defs for this board
@@ -194,11 +208,6 @@
 #define PANICUPDATE_BUTTON 37  // two
 
 #define STATUS_LED 22 // This board has a GPIO hooked to an LED, high is LED on
-
-#else
-
-#error board type not set
-
 #endif
 
 #ifdef BOARD_TTGO_T5

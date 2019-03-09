@@ -13,9 +13,13 @@ export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T5_23 -DAUTOBUILD"
 pio run # -v
 ./publish-firmware.sh L
 
-export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T5_16 -DAUTOBUILD"
+export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T5_16_RED -DAUTOBUILD"
 pio run # -v
 ./publish-firmware.sh K
+
+export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T5_16_YELLOW -DAUTOBUILD"
+pio run # -v
+./publish-firmware.sh Y
 
 export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_O -DAUTOBUILD"
 pio run # -v
