@@ -2,6 +2,8 @@ set -e
 
 ./incbuild.sh
 export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T4 -DAUTOBUILD"
+# For the first build we do it clean because it seems like build numbers were stale in the main.ino file
+pio run -t clean
 pio run # -v
 ./publish-firmware.sh R
 

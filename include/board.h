@@ -31,10 +31,11 @@
 #define TFT_LED 4 // backlight
 
 // Button defs for this board
+// FIXME add back GPIO 0/boot as button 4 but only after turning on internal pullup and testing
 #define NUM_BUTTONS 3
 #define BUTTON_GPIOS \
   {                  \
-    38, 37, 39       \
+    38, 37, 39    \
   }
 #define FACTORYRESET_BUTTON 38 // one
 #define PANICUPDATE_BUTTON 37  // two

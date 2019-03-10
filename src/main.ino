@@ -42,7 +42,7 @@
 // nasty magic to stringify a numeric macro
 #define xstr(s) str(s)
 #define str(s) #s
-#define VERSION_STRING "V0.1.4-" xstr(VERSION_NUM)
+#define VERSION_STRING "V0.1.6-" xstr(VERSION_NUM)
 
 void jpegRender(int xpos, int ypos);
 
@@ -51,7 +51,8 @@ AutoConnectConfig portalConfig;
 AutoConnect portal(webServer);
 
 // We construct our filename to be different for each board type
-AutoUpdate update(String("https://") + xstr(BUCKETNAME) + ".s3.amazonaws.com/" + "firmware-" + JOYBOARD_TYPE);
+// NOTE: HTTPS DOES NOT WORK YET - Gets a -11 error
+AutoUpdate update(String("http://") + xstr(BUCKETNAME) + ".s3.amazonaws.com/" + "firmware-J" + JOYBOARD_TYPE);
 
 RTC_DATA_ATTR int bootCount = 0;
 
@@ -704,7 +705,7 @@ void dispTest()
 bool startCP(IPAddress ip)
 {
     Serial.println("Config portal started, IP:" + WiFi.localIP().toString());
-    showBootScreen(String("Please config wifi at ") + portalConfig.apid);
+    showBootScreen(String("Config wifi at ") + portalConfig.apid);
     return true;
 }
 
