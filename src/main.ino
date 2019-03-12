@@ -34,6 +34,7 @@
 #include "FS.h"
 #include "SPIFFS.h"
 #include "buildnum.h"
+#include <InterruptButtons.h>
 #include <AutoConnect.h>
 
 // #include "wifikeys.h"
@@ -156,8 +157,6 @@ const PushSource pushSources[] = PUSH_SOURCES;
 const PushSource pushSources[] = {};
 #endif
 
-const uint8_t BUTTON_PINS[NUM_BUTTONS] = BUTTON_GPIOS;
-Bounce *buttons = new Bounce[NUM_BUTTONS];
 uint64_t wakeButtons;         // If we woke due to a button press these bits will be set
 esp_sleep_source_t wakeCause; // the reason we booted this time
 
@@ -232,9 +231,9 @@ void doDeepSleep()
     uint64_t gpioMask = 0;
 
     // FIXME change polarity so we can wake on ANY_HIGH instead - that would allow us to use all three buttons (instead of just the first)
-    for (int i = 0; i < 1 /* sizeof(BUTTON_PINS) */; i++)
+    for (int i = 0; i < 1 /* sizeof(buttons.gpios) */; i++)
     {
-        gpio_num_t wakeGpio = (gpio_num_t)BUTTON_PINS[i];
+        gpio_num_t wakeGpio = (gpio_num_t)buttons.gpios[i];
 
         // schematic says external pullup resistors on the T5 board, assuming they are on the others as well.  the switch shorts to ground
         //gpio_pullup_en(wakeGpio);
@@ -742,7 +741,7 @@ void setup()
     wakeCause = esp_sleep_get_wakeup_cause();
     wakeButtons = esp_sleep_get_ext1_wakeup_status();       // If one of these buttons is set it was the reason we woke
     if (wakeCause == ESP_SLEEP_WAKEUP_EXT1 && !wakeButtons) // we must have been using the 'all buttons rule for waking' to support busted boards, assume button one was pressed
-        wakeButtons = ((uint64_t)1) << BUTTON_PINS[0];
+        wakeButtons = ((uint64_t)1) << buttons.gpios[0];
 
     Serial.printf("booted, wake cause %d, buttons 0x%llx (boot count %d)\n", wakeCause, wakeButtons, bootCount);
     // FIXME ESP_SLEEP_WAKEUP_EXT1 button presses and ESP_SLEEP_WAKEUP_TIMER for idle timer
@@ -863,15 +862,7 @@ void setup()
     mqtt.setServer("devsrv.ezdevice.net", 1883);
     mqtt.setCallback(mqttCallback);
 
-    for (int i = 0; i < NUM_BUTTONS; i++)
-    {
-        rtc_gpio_deinit((gpio_num_t)BUTTON_PINS[i]); // Make sure it is disconnected from the RTC (where it was attached over sleep)
-
-        // Note: use INPUT_PULLUP if the internal pullups are required (TTGO boards seem to have external pullups)
-        buttons[i].attach(BUTTON_PINS[i], INPUT); //setup the bounce instance for the current button
-
-        buttons[i].interval(25); // interval in ms
-    }
+    buttons.setup();
 
     delaySleep(); // We will wait to get a message from the server before we go to sleep (hopefully, eventually we will just bail)
     Serial.println("done with setup");
@@ -924,12 +915,9 @@ void buttonCheck()
     else
         for (int i = 0; i < NUM_BUTTONS; i++)
         {
-            bool wakePress = isFirstCheck && (wakeButtons & (((uint64_t)1) << BUTTON_PINS[i]));
+            bool wakePress = isFirstCheck && (wakeButtons & (((uint64_t)1) << buttons.gpios[i]));
 
-            // Update the Bounce instance :
-            buttons[i].update();
-
-            if (buttons[i].fell() || wakePress)
+            if (buttons.handle(i) || wakePress)
             {
                 // either send press to server or use it to cancel the current image
                 if (showingTempImage)
