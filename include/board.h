@@ -1,9 +1,9 @@
 #pragma once
 
 #ifndef AUTOBUILD // If we are being invoked in a release script make sure these settings come from there
-#define BOARD_TTGO_T4
+// #define BOARD_TTGO_T4
 // #define BOARD_TTGO_T5s
-// #define BOARD_TTGO_T5_23 // with a 2.13" screen
+#define BOARD_TTGO_T5_23 // with a 2.13" screen
 // #define BOARD_TTGO_T5_16_RED // with a red-black 2.9" screen
 // #define BOARD_TTGO_T5_16_YELLOW // with a red-black 2.9" screen
 
@@ -35,7 +35,7 @@
 #define NUM_BUTTONS 3
 #define BUTTON_GPIOS \
   {                  \
-    38, 37, 39    \
+    38, 37, 39       \
   }
 #define FACTORYRESET_BUTTON 38 // one
 #define PANICUPDATE_BUTTON 37  // two
@@ -173,6 +173,14 @@
 // #define PANICUPDATE_BUTTON 38  // two
 
 #define STATUS_LED 19 // This board has a GPIO hooked to an LED, high is LED on
+
+// Various datasources to poll perodically and upload to our server
+#define PUSH_SOURCES         \
+  {                          \
+    {                        \
+      "Vbat", 35, 1.0f, 0.0f \
+    }                        \
+  }
 
 #elif defined(BOARD_TTGO_T5_16_RED)
 

@@ -139,6 +139,23 @@ GxGDEW029Z10 disp(epaperIO, EPD_RESET, EPD_BUSY);
 #error no display defined
 #endif
 
+// Sources for periodic publishes of device state.
+// Initially assume an analog input
+// FIXME: generalize via inheritence to allow other input types or use a virtual function to read special value types
+struct PushSource
+{
+    const char *name; // source will be published with this identifier
+    int gpioNum;
+    float scaling; // Used to prescale the read value before uploading
+    float offset;  // uploaded value is rawValue * scale + offset
+};
+
+#ifdef PUSH_SOURCES
+const PushSource pushSources[] = PUSH_SOURCES;
+#else
+const PushSource pushSources[] = {};
+#endif
+
 const uint8_t BUTTON_PINS[NUM_BUTTONS] = BUTTON_GPIOS;
 Bounce *buttons = new Bounce[NUM_BUTTONS];
 uint64_t wakeButtons;         // If we woke due to a button press these bits will be set
@@ -374,6 +391,8 @@ const char *getTopic(const char *suffix, const char *direction = "dev")
 
 void publish(const char *suffix, const char *payload, bool retained = false)
 {
+    printf("publish %s = %s\n", suffix, payload);
+
     mqtt.publish(getTopic(suffix), payload, retained);
 }
 
@@ -860,6 +879,32 @@ void setup()
 
 void epdTest();
 
+/** Send all of our push publishes - FIXME, allow variable polling intervals.  Currently we send once at boot */
+void sendPushSources()
+{
+    static bool isFirstCheck = true;
+
+    if (isFirstCheck)
+    {
+        int numSources = sizeof(pushSources) / sizeof(pushSources[0]);
+        for (int i = 0; i < numSources; i++)
+        {
+            const PushSource &s = pushSources[i];
+
+            String topic("push/");
+            topic += s.name;
+
+            int raw = analogRead(s.gpioNum);
+            float val = raw * s.scaling + s.offset;
+            String valStr = String(val);
+
+            publish(topic.c_str(), valStr.c_str());
+        }
+
+        isFirstCheck = false;
+    }
+}
+
 /**
    Check to see if the user just released a button or a button press was the reason we booted most recently
  */
@@ -873,8 +918,7 @@ void buttonCheck()
     { // If we booted because our timer ran out or the user pressed reset, send those as fake events
         const char *reason = (wakeCause == ESP_SLEEP_WAKEUP_TIMER) ? "timeout" : "reset";
 
-        printf("pressed %s\n", reason);
-        publish("press", reason);
+        publish("event", reason);
         delaySleep(); // if someone presses anything, stay alive a little longer
     }
     else
@@ -887,8 +931,6 @@ void buttonCheck()
 
             if (buttons[i].fell() || wakePress)
             {
-                printf("press %s\n", buttonNames[i]);
-
                 // either send press to server or use it to cancel the current image
                 if (showingTempImage)
                 {
@@ -898,7 +940,7 @@ void buttonCheck()
                     showingTempImage = false;
                 }
                 else
-                    publish("press", buttonNames[i]);
+                    publish("event", buttonNames[i]);
                 // epdTest();
                 delaySleep(); // if someone presses anything, stay alive a little longer
             }
@@ -946,8 +988,11 @@ void loop()
 
     showNewImages();
 
-    if (mqtt.connected()) // We only check for buttons when we are connected and subscribed for responses
+    if (mqtt.connected())
+    { // We only check for buttons when we are connected and subscribed for responses
         buttonCheck();
+        sendPushSources();
+    }
 
     if (currentMillis - previousMillis >= interval)
     {

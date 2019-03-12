@@ -60,6 +60,7 @@ board type L in my arch
 Works well
 GDE0213B1 display
 LED on IO19
+Vbat analog in on GPIO35
 
 ## epaper TTGO T5_V1.6 red/black eink 2.9" 296x128
 
