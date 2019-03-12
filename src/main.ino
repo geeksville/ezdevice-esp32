@@ -157,6 +157,8 @@ const PushSource pushSources[] = PUSH_SOURCES;
 const PushSource pushSources[] = {};
 #endif
 
+#define EVENT_TOPIC "press" // FIXME - change to "event"
+
 uint64_t wakeButtons;         // If we woke due to a button press these bits will be set
 esp_sleep_source_t wakeCause; // the reason we booted this time
 
@@ -909,15 +911,20 @@ void buttonCheck()
     { // If we booted because our timer ran out or the user pressed reset, send those as fake events
         const char *reason = (wakeCause == ESP_SLEEP_WAKEUP_TIMER) ? "timeout" : "reset";
 
-        publish("event", reason);
+        publish(EVENT_TOPIC, reason);
         delaySleep(); // if someone presses anything, stay alive a little longer
     }
     else
+    {
+        bool hasHandledSomething = false;
+
         for (int i = 0; i < NUM_BUTTONS; i++)
         {
             bool wakePress = isFirstCheck && (wakeButtons & (((uint64_t)1) << buttons.gpios[i]));
 
-            if (buttons.handle(i) || wakePress)
+            // If the user has pressed multiple buttons (because they were waiting for a slow eink draw we accept the first one and then ignore the others)
+            // we still need to call handle() to mark that we are throwing away that press
+            if ((buttons.handle(i) || wakePress) && !hasHandledSomething)
             {
                 // either send press to server or use it to cancel the current image
                 if (showingTempImage)
@@ -928,11 +935,13 @@ void buttonCheck()
                     showingTempImage = false;
                 }
                 else
-                    publish("event", buttonNames[i]);
+                    publish(EVENT_TOPIC, buttonNames[i]);
                 // epdTest();
                 delaySleep(); // if someone presses anything, stay alive a little longer
+                hasHandledSomething = true;
             }
         }
+    }
 
     isFirstCheck = false; // we only check wake buttons on first call of this function
 }
