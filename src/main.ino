@@ -157,7 +157,7 @@ const PushSource pushSources[] = PUSH_SOURCES;
 const PushSource pushSources[] = {};
 #endif
 
-#define EVENT_TOPIC "press" // FIXME - change to "event"
+#define EVENT_TOPIC "event" // was "press"
 
 uint64_t wakeButtons;         // If we woke due to a button press these bits will be set
 esp_sleep_source_t wakeCause; // the reason we booted this time
