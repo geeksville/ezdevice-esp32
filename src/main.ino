@@ -74,9 +74,6 @@ Adafruit_ILI9341 disp = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 #include <Wire.h>
 #include <Adafruit_SSD1306.h>
 
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
-
 Adafruit_SSD1306 disp(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #elif defined(EPD_CS)
