@@ -6,8 +6,8 @@
 // #define BOARD_TTGO_T5_23 // with a 2.13" screen
 // #define BOARD_TTGO_T5_16_RED // with a red-black 2.9" screen
 // #define BOARD_TTGO_T5_16_YELLOW // with a red-black 2.9" screen
-// #define BOARD_TTGO_T_JOURNAL // camera oled
-#define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
+#define BOARD_TTGO_T_JOURNAL // camera oled
+// #define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
 #endif
 
@@ -207,9 +207,9 @@
 
 // deep sleep works well on this board, but the sleep current draw is 10mA due to something buzzing on the board (regulator?)
 #define DEEPSLEEP_INTERVAL (24 * 60 * 60 * 1000) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
-#define DEEPSLEEP_IDLE (30 * 1000)               // This this period passes without any activity (button press or message from server), go to sleep
+#define DEEPSLEEP_IDLE (60 * 1000)               // This this period passes without any activity (button press or message from server), go to sleep
 
-#define STATUS_LED 4 // This board has a GPIO hooked to an LED, high is LED on
+// #define STATUS_LED 4 // This board has a GPIO hooked to an LED, high is LED on
 
 // #define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
 

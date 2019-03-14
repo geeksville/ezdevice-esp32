@@ -25,8 +25,10 @@ void IRAM_ATTR InterruptButtons::isr()
     }
 }
 
-void InterruptButtons::setup()
+void InterruptButtons::setup(bool _useInterrupts)
 {
+    useInterrupts = _useInterrupts;
+
     uint32_t now = millis();
     for (int i = 0; i < NUM_BUTTONS; i++)
     {
@@ -47,8 +49,16 @@ void InterruptButtons::setup()
         }
 
         // Set motionSensor pin as interrupt, assign interrupt function
-        attachInterrupt(digitalPinToInterrupt(gpios[i]), isr, FALLING);
+        if (useInterrupts)
+            attachInterrupt(digitalPinToInterrupt(gpios[i]), isr, FALLING);
     }
+}
+
+void InterruptButtons::loop()
+{
+    // If we aren't allowed to use interrupts we just fake it with polling
+    if (!useInterrupts)
+        isr();
 }
 
 bool InterruptButtons::anyPressed()

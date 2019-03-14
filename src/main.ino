@@ -39,6 +39,7 @@
 
 // #include "wifikeys.h"
 #include "board.h"
+#include "camera.h"
 
 // nasty magic to stringify a numeric macro
 #define xstr(s) str(s)
@@ -183,7 +184,23 @@ fs::FS *flashFS;
 
 uint32_t updateAtMillis = 0; // the server asked us to do a software update (in the main thread)
 
-void publish(const char *suffix, const char *payload, bool retained);
+typedef String (*RPCFunct)(String arg);
+
+// RPC function definitions
+// FIXME refactor all this garbage into separate files
+struct RPCFunctInfo
+{
+    const char *name;
+    RPCFunct ptr;
+};
+
+const RPCFunctInfo rpcFuncts[] = {
+#ifdef CAM_CONFIG
+    {"snapshot", camSnapshot},
+#endif
+    {NULL, NULL}};
+
+void publish(String suffix, String payload, bool retained);
 
 void doDeepSleep()
 {
@@ -379,19 +396,19 @@ void initClientId()
 #endif
 }
 
-const char *getTopic(const char *suffix, const char *direction = "dev")
+const char *getTopic(String suffix, const char *direction = "dev")
 {
-    static char buf[64];
+    static char buf[128];
 
-    snprintf(buf, sizeof(buf), "/ezd/%s/%s/%s", direction, clientId, suffix);
+    snprintf(buf, sizeof(buf), "/ezd/%s/%s/%s", direction, clientId, suffix.c_str());
     return buf;
 }
 
-void publish(const char *suffix, const char *payload, bool retained = false)
+void publish(String suffix, String payload, bool retained = false)
 {
-    printf("publish %s = %s\n", suffix, payload);
+    printf("publish %s = %s\n", suffix.c_str(), payload.c_str());
 
-    mqtt.publish(getTopic(suffix), payload, retained);
+    mqtt.publish(getTopic(suffix), payload.c_str(), retained);
 }
 
 /** save an image file to a filesystem
@@ -575,6 +592,31 @@ void handleUpgrade(const char *urlBase)
     // we are also careful to wait a few seconds so our ack of the message has time to get sent
 }
 
+/**
+ * Look for requests like this:
+ * /ezd/todev/id/call/functname/transid argument
+ * Then call function and return function result by publishing
+* /ezd/dev/id/result/transid result
+ */
+void handleFunction(String functName, String transId, String argument)
+{
+    // find function
+    const RPCFunctInfo *fptr = rpcFuncts;
+    while (fptr->name)
+    {
+        if (functName == fptr->name)
+            break;
+
+        fptr++;
+    }
+
+    String result = "undefined";
+    if (fptr && fptr->ptr)
+        result = (*fptr->ptr)(argument);
+
+    publish(String("result/") + transId, result);
+}
+
 void mqttCallback(char *topic, byte *payload, unsigned int length)
 {
 
@@ -587,9 +629,26 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
     String showPrefix = String(getTopic("show", "todev"));
     String channelPrefix = String(getTopic("showMessage", "todev"));
     String upgradePrefix = String(getTopic("newFirmware", "todev"));
+    String callPrefix = String(getTopic("call", "todev"));
     // parse /ezd/todev/SR2/show/forever
     if (topicStr.startsWith(showPrefix))
         handleShow(topicStr.substring(showPrefix.length() + 1), (const char *)payload);
+    else if (topicStr.startsWith(callPrefix))
+    {
+        // parse  /ezd/todev/id/call/functname/transid
+
+        // topicTail functname/transid
+        String topicTail = topicStr.substring(callPrefix.length() + 1);
+        int slashIndex = topicTail.indexOf('/');
+        if (slashIndex < 0)
+        {
+            Serial.printf("Malformed function call: %s\n", topicTail.c_str());
+        }
+        String functname = topicTail.substring(0, slashIndex);
+        String transId = topicTail.substring(slashIndex + 1);
+
+        handleFunction(functname, transId, (const char *)payload);
+    }
     else if (topicStr.startsWith(channelPrefix))
         handleShowMessage((const char *)payload);
     else if (topicStr.startsWith(upgradePrefix))
@@ -861,7 +920,12 @@ void setup()
     mqtt.setServer("devsrv.ezdevice.net", 1883);
     mqtt.setCallback(mqttCallback);
 
-    buttons.setup();
+#ifdef CAM_CONFIG
+    buttons.setup(false); // we can't use isrs with gpios if using i2s?
+    camSetup();
+#else
+    buttons.setup(true);
+#endif
 
     delaySleep(); // We will wait to get a message from the server before we go to sleep (hopefully, eventually we will just bail)
     Serial.println("done with setup");
@@ -888,7 +952,7 @@ void sendPushSources()
             float val = raw * s.scaling + s.offset;
             String valStr = String(val);
 
-            publish(topic.c_str(), valStr.c_str());
+            publish(topic, valStr);
         }
 
         isFirstCheck = false;
@@ -976,6 +1040,7 @@ void loop()
     unsigned long currentMillis = millis();
     static bool firstAttempt = true;
 
+    buttons.loop();
     portal.handleClient();
 
     perhapsSleep();
