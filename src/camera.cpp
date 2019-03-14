@@ -13,6 +13,7 @@ void camSetup()
     // https://github.com/espressif/esp32-camera/blob/master/driver/camera.c#L1043
     // there is speculating on the net there is some sort of conflict between i2s interrupts and gpio interrupts, if both on there are problems.
     // For now my fix is to not use interrupts for GPIO detection on boards with cameras.
+    // CAM_CONFIG.fb_count = 1; // we don't need the fast DMA version? - it sucks power
     int res = cam.init(CAM_CONFIG);
     Serial.printf("Camera init returned %d\n", res);
 }
@@ -21,11 +22,13 @@ void camSetup()
 // we should take the pict and PUT it to the specified URL
 String camSnapshot(String destURL)
 {
+    Serial.println("Beginning snapshot");
     HTTPClient http;
     http.begin(camUploadClient, destURL);
     http.addHeader("Content-Type", "image/jpeg");
 
-    cam.run(); // queue up a read for next time
+    cam.run(); // read the next frame (this frame might have been acquired LONG ago, so for now we just discard it and read a new fresh frame)
+    cam.run(); // This frame should reflect recent history
 
     int result = http.PUT(cam.getfb(), cam.getSize());
     Serial.printf("Frame uploaded, result %d\n", result);
@@ -35,4 +38,3 @@ String camSnapshot(String destURL)
 }
 
 #endif
-
