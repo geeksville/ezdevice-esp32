@@ -206,8 +206,8 @@
 // #define DISP_COLOR // If defined we assume color display, else assumed mono
 
 // deep sleep works well on this board, but the sleep current draw is 10mA due to something buzzing on the board (regulator?)
-#define DEEPSLEEP_INTERVAL (24 * 60 * 60 * 1000) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
-#define DEEPSLEEP_IDLE (60 * 1000)               // This this period passes without any activity (button press or message from server), go to sleep
+//#define DEEPSLEEP_INTERVAL (24 * 60 * 60 * 1000) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
+//#define DEEPSLEEP_IDLE (60 * 1000)               // This this period passes without any activity (button press or message from server), go to sleep
 
 // #define STATUS_LED 4 // This board has a GPIO hooked to an LED, high is LED on
 
@@ -249,12 +249,12 @@
 
 #define CAM_CONFIG esp32cam_ttgo_t_config
 
-#define DISP_ADAFRUIT                            // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
+#define DISP_ADAFRUIT // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
 // #define DISP_COLOR // If defined we assume color display, else assumed mono
 
 // deep sleep works well on this board, but the sleep current draw is 10mA due to something buzzing on the board (regulator?)
-#define DEEPSLEEP_INTERVAL (24 * 60 * 60 * 1000) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
-#define DEEPSLEEP_IDLE (30 * 1000)               // This this period passes without any activity (button press or message from server), go to sleep
+//#define DEEPSLEEP_INTERVAL (24 * 60 * 60 * 1000) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
+//#define DEEPSLEEP_IDLE (30 * 1000)               // This this period passes without any activity (button press or message from server), go to sleep
 
 #define STATUS_LED 4 // This board has a GPIO hooked to an LED, high is LED on
 
