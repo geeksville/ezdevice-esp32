@@ -592,29 +592,38 @@ void handleUpgrade(const char *urlBase)
     // we are also careful to wait a few seconds so our ack of the message has time to get sent
 }
 
+String functName;
+String functTransId;
+String functArgument;
+
 /**
  * Look for requests like this:
  * /ezd/todev/id/call/functname/transid argument
  * Then call function and return function result by publishing
 * /ezd/dev/id/result/transid result
  */
-void handleFunction(String functName, String transId, String argument)
+void handleFunction()
 {
-    // find function
-    const RPCFunctInfo *fptr = rpcFuncts;
-    while (fptr->name)
+    if (functName.length() != 0)
     {
-        if (functName == fptr->name)
-            break;
+        // find function
+        const RPCFunctInfo *fptr = rpcFuncts;
+        while (fptr->name)
+        {
+            if (functName == fptr->name)
+                break;
 
-        fptr++;
+            fptr++;
+        }
+
+        functName = "";
+        String transId = functTransId; // function invocation can take a long time, allow the mqtt thread to queue up another function call during that window
+        String result = "undefined";
+        if (fptr && fptr->ptr)
+            result = (*fptr->ptr)(functArgument);
+
+        publish(String("result/") + transId, result);
     }
-
-    String result = "undefined";
-    if (fptr && fptr->ptr)
-        result = (*fptr->ptr)(argument);
-
-    publish(String("result/") + transId, result);
 }
 
 void mqttCallback(char *topic, byte *payload, unsigned int length)
@@ -644,10 +653,11 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
         {
             Serial.printf("Malformed function call: %s\n", topicTail.c_str());
         }
-        String functname = topicTail.substring(0, slashIndex);
-        String transId = topicTail.substring(slashIndex + 1);
+        functName = topicTail.substring(0, slashIndex);
+        functTransId = topicTail.substring(slashIndex + 1);
+        functArgument = (const char *)payload;
 
-        handleFunction(functname, transId, (const char *)payload);
+        // handleFunction();
     }
     else if (topicStr.startsWith(channelPrefix))
         handleShowMessage((const char *)payload);
@@ -1034,6 +1044,8 @@ void showNewImages()
     }
 }
 
+//#include "freertos/task.h"
+
 void loop()
 {
     static uint32_t startMsec = millis();
@@ -1042,6 +1054,7 @@ void loop()
 
     buttons.loop();
     portal.handleClient();
+    handleFunction(); // Run any RPC calls from this thread
 
     perhapsSleep();
 
@@ -1058,6 +1071,8 @@ void loop()
         previousMillis = currentMillis;
         interval = 500;
         blinkStatus();
+
+        // Serial.printf("high water %d\n", uxTaskGetStackHighWaterMark(NULL));
 
         if ((WiFi.status() == WL_CONNECTED))
         {
@@ -1087,10 +1102,18 @@ void loop()
             // we try to wait up to 5 seconds before deciding we need a boot screen - to tell the user something is wrong
             static bool didShowWifiMessage = false;
 
-            if (millis() - startMsec >= 5000 && !didShowWifiMessage)
+            // We give up to 5 seconds for first wifi connect
+            if (millis() - startMsec >= 5000)
             {
-                didShowWifiMessage = true; // Only show the message once to keep eink from flickering
-                showBootScreen(String("Looking for ") + WiFi.SSID());
+                // Every 30secs without wifi we force the connection to teardown and try again.
+                WiFi.reconnect();
+                interval = 30000; // we do this slow
+
+                if (!didShowWifiMessage)
+                {
+                    didShowWifiMessage = true; // Only show the message once to keep eink from flickering
+                    showBootScreen(String("Looking for ") + WiFi.SSID());
+                }
             }
         }
     }

@@ -6,6 +6,7 @@
 
 OV2640 cam;
 WiFiClient camUploadClient;
+HTTPClient httpUpload;
 
 void camSetup()
 {
@@ -22,17 +23,29 @@ void camSetup()
 // we should take the pict and PUT it to the specified URL
 String camSnapshot(String destURL)
 {
+    int result = 0;
     Serial.println("Beginning snapshot");
-    HTTPClient http;
-    http.begin(camUploadClient, destURL);
-    http.addHeader("Content-Type", "image/jpeg");
 
     cam.run(); // read the next frame (this frame might have been acquired LONG ago, so for now we just discard it and read a new fresh frame)
     cam.run(); // This frame should reflect recent history
 
-    int result = http.PUT(cam.getfb(), cam.getSize());
-    Serial.printf("Frame uploaded, result %d\n", result);
-    http.end();
+    uint8_t *bytes = cam.getfb();
+    size_t numbytes = cam.getSize();
+    if (bytes && numbytes)
+    {
+        httpUpload.begin(camUploadClient, destURL);
+        httpUpload.addHeader("Content-Type", "image/jpeg");
+
+        result = httpUpload.PUT(bytes, numbytes);
+        Serial.printf("Frame uploaded, result %d\n", result);
+
+        httpUpload.end();
+    }
+    else
+    {
+        Serial.println("FIXME - unexpected null framebuffer");
+        result = -2;
+    }
 
     return String(result);
 }

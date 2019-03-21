@@ -1,12 +1,12 @@
 #pragma once
 
 #ifndef AUTOBUILD // If we are being invoked in a release script make sure these settings come from there
-// #define BOARD_TTGO_T4
+#define BOARD_TTGO_T4
 // #define BOARD_TTGO_T5s
 // #define BOARD_TTGO_T5_23 // with a 2.13" screen
 // #define BOARD_TTGO_T5_16_RED // with a red-black 2.9" screen
 // #define BOARD_TTGO_T5_16_YELLOW // with a red-black 2.9" screen
-#define BOARD_TTGO_T_JOURNAL // camera oled
+// #define BOARD_TTGO_T_JOURNAL // camera oled
 // #define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
 #endif
@@ -21,7 +21,7 @@
 
 // Deep sleep works on this board, but the power manager will shut us down automatically after a while (I think - still TBD)
 #define DEEPSLEEP_INTERVAL (365 * 24 * 60 * 60 * 1000ULL) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
-#define DEEPSLEEP_IDLE (50 * 1000)                        // This this period passes without any activity (button press or message from server), go to sleep
+#define DEEPSLEEP_IDLE (120 * 1000)                        // This this period passes without any activity (button press or message from server), go to sleep
 
 #define TFT_CS 27 // If undefined we assume no TFT screen
 #define TFT_DC 26
@@ -202,7 +202,7 @@
 
 #define CAM_CONFIG esp32cam_config
 
-#define DISP_ADAFRUIT                            // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
+#define DISP_ADAFRUIT // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
 // #define DISP_COLOR // If defined we assume color display, else assumed mono
 
 // deep sleep works well on this board, but the sleep current draw is 10mA due to something buzzing on the board (regulator?)
