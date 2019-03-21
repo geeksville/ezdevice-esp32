@@ -26,3 +26,16 @@ pio run # -v
 export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_O -DAUTOBUILD"
 pio run # -v
 ./publish-firmware.sh O
+
+export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_CAMERA -DAUTOBUILD"
+pio run # -v
+./publish-firmware.sh C
+
+export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_CAMERA -DAUTOBUILD"
+pio run # -v
+./publish-firmware.sh C
+
+export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T_JOURNAL -DAUTOBUILD"
+pio run # -v
+./publish-firmware.sh T
+

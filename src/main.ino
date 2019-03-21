@@ -44,7 +44,7 @@
 // nasty magic to stringify a numeric macro
 #define xstr(s) str(s)
 #define str(s) #s
-#define VERSION_STRING "V0.1.6-" xstr(VERSION_NUM)
+#define VERSION_STRING "V0.1.7-" xstr(VERSION_NUM)
 
 void jpegRender(int xpos, int ypos);
 
