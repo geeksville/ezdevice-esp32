@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef AUTOBUILD // If we are being invoked in a release script make sure these settings come from there
-#define BOARD_TTGO_T4
+// #define BOARD_TTGO_T4
 // #define BOARD_TTGO_T5s
 // #define BOARD_TTGO_T5_23 // with a 2.13" screen
 // #define BOARD_TTGO_T5_16_RED // with a red-black 2.9" screen
@@ -9,6 +9,8 @@
 // #define BOARD_TTGO_T_JOURNAL // camera oled
 // #define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
+
+#define BOARD_M5STICK // small oled with button and led
 #endif
 
 #ifdef BOARD_TTGO_T4
@@ -81,6 +83,49 @@
     0                \
   } // 0 is boot, 2 is en but hardwired to reset on the board
 // #define FACTORYRESET_BUTTON 39 // three
+// #define PANICUPDATE_BUTTON 38 // one
+
+#define DISPLAY_ROTATION 0            // 0 & 2 Portrait. 1 & 3 landscape
+#define DISPLAY_UPDATE disp.display() // command needed to flush the display to the actual hardware
+
+#define BACKGROUND BLACK // Background color
+#define FOREGROUND WHITE
+#define ACCENT WHITE
+
+#define BITMAP_WHITE BLACK // We are mostly drawing text, so we want a black background for OLED (and the server is sending white for the background)
+#define BITMAP_BLACK WHITE
+
+#define DRAW_ANIM_DELAY 300
+
+#elif defined(BOARD_M5STICK)
+
+#define JOYBOARD_TYPE "MS"
+
+// #define DISP_ADAFRUIT                            // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
+// #define DISP_COLOR // If defined we assume color display, else assumed mono
+
+// deep sleep works well on this board, but the sleep current draw is 10mA due to something buzzing on the board (regulator?)
+#define DEEPSLEEP_INTERVAL (24 * 60 * 60 * 1000) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
+#define DEEPSLEEP_IDLE (30 * 1000)               // This this period passes without any activity (button press or message from server), go to sleep
+
+#define STATUS_LED 19 // This board has a GPIO hooked to an LED, high is LED on
+
+// #define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
+
+#define OLED_CS 14 // SH1106 OLED on SPI (NOT I2C)
+#define OLED_DC 27
+#define OLED_RESET 33 // Reset pin # (or -1 if sharing Arduino reset pin)
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+
+// Button defs for this board
+#define NUM_BUTTONS 1
+#define BUTTON_GPIOS \
+  {                  \
+    35               \
+  } // 0 is boot, 2 is en but hardwired to reset on the board
+#define FACTORYRESET_BUTTON 35
 // #define PANICUPDATE_BUTTON 38 // one
 
 #define DISPLAY_ROTATION 0            // 0 & 2 Portrait. 1 & 3 landscape

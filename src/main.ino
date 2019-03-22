@@ -135,7 +135,9 @@ GxGDEW029Z10 disp(epaperIO, EPD_RESET, EPD_BUSY);
 #endif
 
 #else
-#error no display defined
+
+#define NO_DISPLAY 1
+
 #endif
 
 // Sources for periodic publishes of device state.
@@ -314,6 +316,7 @@ void blinkStatus()
    firmware update if necessary */
 void turnOnDisplay()
 {
+#ifndef NO_DISPLAY
     static bool displayOn;
     if (displayOn)
         return;
@@ -351,6 +354,7 @@ void turnOnDisplay()
     disp.setFont(&FreeSans9pt7b);
     disp.setRotation(DISPLAY_ROTATION); // 0 & 2 Portrait. 1 & 3 landscape
     Serial.printf("Display running, width %d, height %d\n", disp.width(), disp.height());
+#endif
 }
 
 char clientId[16];
@@ -478,6 +482,7 @@ ByteStream *loadImage(const char *filename)
  */
 void showImageNow(ByteStream &stream, bool doUpdate = true)
 {
+#ifndef NO_DISPLAY
     int len = stream.available();
     const uint8_t *payload = stream.getBytes();
     Serial.printf("Showing image: %d bytes\n", len);
@@ -525,6 +530,7 @@ void showImageNow(ByteStream &stream, bool doUpdate = true)
         DISPLAY_UPDATE;
         delaySleep();
     }
+#endif
 }
 
 void handleShow(String persistenceIn, const char *url)
@@ -707,6 +713,7 @@ bool reconnect()
    Draw one cycle of the network problem graphic */
 void drawNetworkAnimation()
 {
+#ifndef NO_DISPLAY
     int maxy = disp.height(), maxx = disp.width();
     int xpos = maxx / 2 - 50, ypos = 40;
 
@@ -718,10 +725,12 @@ void drawNetworkAnimation()
     disp.drawBitmap(xpos, ypos, wifi_2, 100, 100, FOREGROUND);
     delay(DRAW_ANIM_DELAY);
     disp.drawBitmap(xpos, ypos, wifi_3, 100, 100, FOREGROUND);
+#endif
 }
 
 void showBootScreen(String msg)
 {
+#ifndef NO_DISPLAY
     turnOnDisplay();
     disp.fillScreen(BACKGROUND);
 
@@ -766,26 +775,7 @@ void showBootScreen(String msg)
         drawNetworkAnimation();
 
     DISPLAY_UPDATE;
-}
-
-void dispTest()
-{
-    //disp.drawCornerTest();
-    //delay(5000);
-
-    uint8_t rotation = disp.getRotation();
-    for (uint16_t r = 0; r < 4; r++)
-    {
-        disp.setRotation(r);
-        disp.fillScreen(BACKGROUND);
-        disp.fillRect(0, 0, 8, 8, FOREGROUND);
-        disp.fillRect(disp.width() - 18, 0, 16, 16, FOREGROUND);
-        disp.fillRect(disp.width() - 25, disp.height() - 25, 24, 24, FOREGROUND);
-        disp.fillRect(0, disp.height() - 33, 32, 32, FOREGROUND);
-        DISPLAY_UPDATE;
-        delay(5000);
-    }
-    disp.setRotation(rotation); // restore
+#endif
 }
 
 bool startCP(IPAddress ip)

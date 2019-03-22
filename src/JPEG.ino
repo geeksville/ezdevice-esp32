@@ -3,16 +3,16 @@
 #include <GxEPD.h>
 
 // Return the minimum of two values a and b
-#define minimum(a,b)     (((a) < (b)) ? (a) : (b))
-
+#define minimum(a, b) (((a) < (b)) ? (a) : (b))
 
 //====================================================================================
 //   Decode and paint onto the TFT screen
 //====================================================================================
-void jpegRender(int xpos, int ypos) {
-
+void jpegRender(int xpos, int ypos)
+{
+#if defined(EPD_CS) || defined(DISP_ADAFRUIT)
     // retrieve infomration about the image
-    uint16_t  *pImg;
+    uint16_t *pImg;
     uint16_t mcu_w = JpegDec.MCUWidth;
     uint16_t mcu_h = JpegDec.MCUHeight;
     uint32_t max_x = JpegDec.width;
@@ -33,7 +33,8 @@ void jpegRender(int xpos, int ypos) {
     max_y += ypos;
 
     // read each MCU block until there are no more
-    while ( JpegDec.read()) {
+    while (JpegDec.read())
+    {
 
         // save a pointer to the image block
         pImg = JpegDec.pImage;
@@ -44,19 +45,23 @@ void jpegRender(int xpos, int ypos) {
 
         // check if the image block size needs to be changed for the right edge
         uint32_t win_w;
-        if (mcu_x + mcu_w <= max_x) win_w = mcu_w;
-        else win_w = min_w;
+        if (mcu_x + mcu_w <= max_x)
+            win_w = mcu_w;
+        else
+            win_w = min_w;
 
         // check if the image block size needs to be changed for the bottom edge
         uint32_t win_h;
-        if (mcu_y + mcu_h <= max_y) win_h = mcu_h;
-        else win_h = min_h;
+        if (mcu_y + mcu_h <= max_y)
+            win_h = mcu_h;
+        else
+            win_h = min_h;
 
 #ifdef DISP_ADAFRUIT
-// copy pixels into a contiguous block
+        // copy pixels into a contiguous block
         if (win_w != mcu_w)
         {
-            for (int h = 1; h < win_h-1; h++)
+            for (int h = 1; h < win_h - 1; h++)
             {
                 memcpy(pImg + h * win_w, pImg + (h + 1) * mcu_w, win_w << 1);
             }
@@ -64,7 +69,7 @@ void jpegRender(int xpos, int ypos) {
 
         // FIXME - implement for eink
         // draw image MCU block only if it will fit on the screen
-        if ( ( mcu_x + win_w) <= disp.width() && ( mcu_y + win_h) <= disp.height())
+        if ((mcu_x + win_w) <= disp.width() && (mcu_y + win_h) <= disp.height())
         {
             // pImg is 565 RGB pixels
             disp.drawRGBBitmap(mcu_x, mcu_y, pImg, win_w, win_h);
@@ -72,7 +77,8 @@ void jpegRender(int xpos, int ypos) {
 
         // Stop drawing blocks if the bottom of the screen has been reached,
         // the abort function will close the file
-        else if ( ( mcu_y + win_h) >= disp.height()) JpegDec.abort();
+        else if ((mcu_y + win_h) >= disp.height())
+            JpegDec.abort();
 #else
         // a slow but simple version that works with eInk
 
@@ -80,7 +86,7 @@ void jpegRender(int xpos, int ypos) {
         // uint32_t mcu_pixels = win_w * win_h;
 
         // draw image MCU block only if it will fit on the screen
-        if ( ( mcu_x + win_w) <= disp.width() && ( mcu_y + win_h) <= disp.height())
+        if ((mcu_x + win_w) <= disp.width() && (mcu_y + win_h) <= disp.height())
         {
             //  disp.startWrite();
 
@@ -89,8 +95,9 @@ void jpegRender(int xpos, int ypos) {
 
             // Write all MCU pixels to the TFT window
             //while (mcu_pixels--) disp.pushColor(*pImg++); // Send MCU buffer to TFT 16 bits at a time
-            for(int y = 0; y < win_h; y++)
-                for(int x = 0; x < win_w; x++) {
+            for (int y = 0; y < win_h; y++)
+                for (int x = 0; x < win_w; x++)
+                {
                     uint16_t p = pImg[x + y * mcu_w];
 
                     p &= 0x1f; // just keep the blue channel for this crude transform
@@ -98,7 +105,7 @@ void jpegRender(int xpos, int ypos) {
 
                     uint16_t pout;
                     // GxEPD_DARKGREY / GxEPD_LIGHTGREY not implemented on this screen
-                    if(p >= 16)
+                    if (p >= 16)
                         pout = GxEPD_WHITE;
                     else
                         pout = GxEPD_BLACK;
@@ -110,7 +117,8 @@ void jpegRender(int xpos, int ypos) {
 
         // stop drawing blocks if the bottom of the screen has been reached
         // the abort function will close the file
-        else if ( ( mcu_y + win_h) >= disp.height()) JpegDec.abort();
+        else if ((mcu_y + win_h) >= disp.height())
+            JpegDec.abort();
 #endif
     }
 
@@ -121,7 +129,9 @@ void jpegRender(int xpos, int ypos) {
     drawTime = millis() - drawTime;
 
     // print the results to the serial port
-    Serial.print  ("Total render time was    : "); Serial.print(drawTime); Serial.println(" ms");
+    Serial.print("Total render time was    : ");
+    Serial.print(drawTime);
+    Serial.println(" ms");
     Serial.println("=====================================");
-
+#endif
 }

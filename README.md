@@ -30,7 +30,7 @@ When setting up wifi on your device your phone should look approximately like th
 
 The master repository for this project is [located here](https://github.com/geeksville/ezdevice-esp32).
 
-# Supported hardware
+# Supported hardware from Lilygo
 
 This project works on many different ESP32 based boards mostly from [Lilygo](http://www.lilygo.cn/). Support for cameras is not yet included in this repo, but will be released in a couple of weeks.
 
@@ -107,12 +107,12 @@ ID code O
 Same as TTGO T4
 (sold as BTC ticker: https://www.aliexpress.com/item/TTGO-T-Watcher-BTC-Ticker-ESP32-for-Arduino-Bitcoin-Price-Ticker-Program-4-MB-SPI-Flash/32890756907.html?spm=a2g0s.9042311.0.0.26fc4c4d51EXTe)
 
-# TTGO-Camera
+## TTGO-Camera
 
 This board looks interesting: https://github.com/LilyGO/esp32-camera-bme280
 I haven't tried it but
 
-# TTGO HiGrow
+## TTGO HiGrow
 
 ID code G
 code not written yet - FIXME see https://github.com/LilyGO/higrowopen/blob/master/HiGrowEsp32/HiGrowEsp32.ino
@@ -125,6 +125,13 @@ DHT dht(DHTPin, DHTTYPE);
 float h = dht.readHumidity();
 // Read temperature as Celsius (the default)
 float t = dht.readTemperature();
+
+# Supported hardware from M5
+
+(WIP not yet complete - if you want to help let me know)
+It seems like hte M5STICK should almost work. Still need to fix the display per https://github.com/wonho-maker/Adafruit_SH1106 and https://github.com/rene-mt/esp8266-oled-sh1106
+Example here https://github.com/m5stack/M5Stack/blob/master/examples/Stick/FactoryTest/FactoryTest.ino
+Docs here https://github.com/m5stack/m5-docs/blob/master/docs/en/core/m5stick.md
 
 # Hardware to avoid
 
