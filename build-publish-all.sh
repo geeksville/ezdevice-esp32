@@ -35,3 +35,11 @@ export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T_JOURNAL -DAUTOBUILD"
 pio run # -v
 ./publish-firmware.sh JT
 
+export PLATFORMIO_BUILD_FLAGS="-DBOARD_M5BASIC -DAUTOBUILD"
+pio run # -v
+./publish-firmware.sh MB
+
+export PLATFORMIO_BUILD_FLAGS="-DBOARD_M5STICK -DAUTOBUILD"
+pio run # -v
+./publish-firmware.sh MS
+
