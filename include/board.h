@@ -1,20 +1,20 @@
 #pragma once
 
 #ifndef AUTOBUILD // If we are being invoked in a release script make sure these settings come from there
-// #define BOARD_TTGO_T4
+#define BOARD_TTGO_T4
 // #define BOARD_TTGO_T5s
 // #define BOARD_TTGO_T5_23 // with a 2.13" screen
 // #define BOARD_TTGO_T5_16_RED // with a red-black 2.9" screen
 // #define BOARD_TTGO_T5_16_YELLOW // with a red-black 2.9" screen
 // #define BOARD_TTGO_T_JOURNAL // camera oled
-#define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
+// #define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
 #endif
 
 #ifdef BOARD_TTGO_T4
 
 // color TFT
-#define JOYBOARD_TYPE 'R'
+#define JOYBOARD_TYPE "JR"
 
 #define DISP_ADAFRUIT // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
 #define DISP_COLOR    // If defined we assume color display, else assumed mono
@@ -52,7 +52,7 @@
 
 #elif defined(BOARD_TTGO_O)
 
-#define JOYBOARD_TYPE 'O'
+#define JOYBOARD_TYPE "JO"
 
 #define DISP_ADAFRUIT                            // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
 // #define DISP_COLOR // If defined we assume color display, else assumed mono
@@ -98,7 +98,7 @@
 #elif defined(BOARD_TTGO_T5s)
 
 // assume eink
-#define JOYBOARD_TYPE 'M'
+#define JOYBOARD_TYPE "JM"
 
 // #define DISP_ADAFRUIT // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
 // #define DISP_COLOR // If defined we assume color display, else assumed mono
@@ -158,7 +158,7 @@
 #elif defined(BOARD_TTGO_T5_23)
 
 // assume eink
-#define JOYBOARD_TYPE 'L'
+#define JOYBOARD_TYPE "JL"
 #define BOARD_TTGO_T5 // Most T5 setup is the same
 
 // Button defs for this board
@@ -188,17 +188,17 @@
 
 #elif defined(BOARD_TTGO_T5_16_RED)
 
-#define JOYBOARD_TYPE 'K'
+#define JOYBOARD_TYPE "JK"
 #define BOARD_TTGO_T5_16
 
 #elif defined(BOARD_TTGO_T5_16_YELLOW)
 
-#define JOYBOARD_TYPE 'Y'
+#define JOYBOARD_TYPE "JY"
 #define BOARD_TTGO_T5_16
 
 #elif defined(BOARD_TTGO_T_JOURNAL)
 
-#define JOYBOARD_TYPE 'T'
+#define JOYBOARD_TYPE "JT"
 
 #define CAM_CONFIG esp32cam_config
 
@@ -245,7 +245,7 @@
 
 #elif defined(BOARD_TTGO_CAMERA)
 
-#define JOYBOARD_TYPE 'C'
+#define JOYBOARD_TYPE "JC"
 
 #define CAM_CONFIG esp32cam_ttgo_t_config
 

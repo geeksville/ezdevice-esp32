@@ -54,7 +54,7 @@ AutoConnect portal(webServer);
 
 // We construct our filename to be different for each board type
 // NOTE: HTTPS DOES NOT WORK YET - Gets a -11 error
-AutoUpdate update(String("http://") + xstr(BUCKETNAME) + ".s3.amazonaws.com/" + "firmware-J" + JOYBOARD_TYPE);
+AutoUpdate update(String("http://") + xstr(BUCKETNAME) + ".s3.amazonaws.com/" + "firmware-" + JOYBOARD_TYPE);
 
 RTC_DATA_ATTR int bootCount = 0;
 
@@ -379,7 +379,7 @@ void initClientId()
 #if 1
     // Note: this is in opposite of usual macaddr ordering - the MSB of the mac
     // is in the bottom of these eight bytes
-    snprintf(clientId, sizeof(clientId), "J%c%02X%02X%02X%02X%02X%02X", JOYBOARD_TYPE,
+    snprintf(clientId, sizeof(clientId), "%s%02X%02X%02X%02X%02X%02X", JOYBOARD_TYPE,
              (uint32_t)((chipid >> 0) & 0xff),
              (uint32_t)((chipid >> 8) & 0xff),
              (uint32_t)((chipid >> 16) & 0xff),
@@ -391,7 +391,7 @@ void initClientId()
 #else
     // base36 only saved two characters, not worth it
     char *base36 = base36enc(chipid);
-    snprintf(clientId, sizeof(clientId), "J%c%s", JOYBOARD_TYPE, base36);
+    snprintf(clientId, sizeof(clientId), "%s%s", JOYBOARD_TYPE, base36);
     free(base36);
 #endif
 }

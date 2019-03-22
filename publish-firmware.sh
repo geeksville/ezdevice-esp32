@@ -13,10 +13,8 @@ if [ -z "$BUCKETNAME" ]; then
 fi
 
 BOARDTYPE=$1 # R or M
-OLDFILENAME=firmware-$BOARDTYPE.bin
-FILENAME=firmware-J$BOARDTYPE.bin
+FILENAME=firmware-$BOARDTYPE.bin
 # aws s3 mb s3://$BUCKETNAME
 aws s3 cp --acl public-read .pioenvs/featheresp32/firmware.bin s3://joyfirmware/$FILENAME
-aws s3 cp --acl public-read .pioenvs/featheresp32/firmware.bin s3://joyfirmware/$OLDFILENAME
 cp .pioenvs/featheresp32/firmware.bin releases/$FILENAME
 echo Firmware published as https://$BUCKETNAME.s3.amazonaws.com/$FILENAME

@@ -5,37 +5,33 @@ export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T4 -DAUTOBUILD"
 # For the first build we do it clean because it seems like build numbers were stale in the main.ino file
 pio run -t clean
 pio run # -v
-./publish-firmware.sh R
+./publish-firmware.sh JR
 
 export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T5s -DAUTOBUILD"
 pio run # -v
-./publish-firmware.sh M
+./publish-firmware.sh JM
 
 export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T5_23 -DAUTOBUILD"
 pio run # -v
-./publish-firmware.sh L
+./publish-firmware.sh JL
 
 export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T5_16_RED -DAUTOBUILD"
 pio run # -v
-./publish-firmware.sh K
+./publish-firmware.sh JK
 
 export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T5_16_YELLOW -DAUTOBUILD"
 pio run # -v
-./publish-firmware.sh Y
+./publish-firmware.sh JY
 
 export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_O -DAUTOBUILD"
 pio run # -v
-./publish-firmware.sh O
+./publish-firmware.sh JO
 
 export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_CAMERA -DAUTOBUILD"
 pio run # -v
-./publish-firmware.sh C
-
-export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_CAMERA -DAUTOBUILD"
-pio run # -v
-./publish-firmware.sh C
+./publish-firmware.sh JC
 
 export PLATFORMIO_BUILD_FLAGS="-DBOARD_TTGO_T_JOURNAL -DAUTOBUILD"
 pio run # -v
-./publish-firmware.sh T
+./publish-firmware.sh JT
 
