@@ -353,6 +353,23 @@ void turnOnDisplay()
 
     disp.setFont(&FreeSans9pt7b);
     disp.setRotation(DISPLAY_ROTATION); // 0 & 2 Portrait. 1 & 3 landscape
+
+#ifdef BOARD_M5BASIC
+    // This board has a different draw sequence than the adafruit lib expects (set during setRotation) - so fix it up by slamming in the correct settings
+#define MADCTL_MY 0x80  ///< Bottom to top
+#define MADCTL_MX 0x40  ///< Right to left
+#define MADCTL_MV 0x20  ///< Reverse Mode
+#define MADCTL_ML 0x10  ///< LCD refresh Bottom to top
+#define MADCTL_RGB 0x00 ///< Red-Green-Blue pixel order
+#define MADCTL_BGR 0x08 ///< Blue-Green-Red pixel order
+#define MADCTL_MH 0x04  ///< LCD refresh right to left
+
+    disp.startWrite();
+    disp.writeCommand(ILI9341_MADCTL);
+    disp.spiWrite(MADCTL_BGR);
+    disp.endWrite();
+#endif
+
     Serial.printf("Display running, width %d, height %d\n", disp.width(), disp.height());
 #endif
 }

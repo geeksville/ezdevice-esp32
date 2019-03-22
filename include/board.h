@@ -9,8 +9,9 @@
 // #define BOARD_TTGO_T_JOURNAL // camera oled
 // #define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
+// #define BOARD_M5STICK // small oled with button and led
+#define BOARD_M5BASIC // 320x240 TFT with 3 buttons
 
-#define BOARD_M5STICK // small oled with button and led
 #endif
 
 #ifdef BOARD_TTGO_T4
@@ -42,6 +43,45 @@
   }
 #define FACTORYRESET_BUTTON 38 // one
 #define PANICUPDATE_BUTTON 37  // two
+
+#define DISPLAY_ROTATION 3 // 0 & 2 Portrait. 1 & 3 landscape
+#define DISPLAY_UPDATE     // command needed to flush the display to the actual hardware
+
+#define BACKGROUND 0x4228 // Background color
+#define FOREGROUND ILI9341_WHITE
+#define ACCENT ILI9341_BLUE
+
+#define DRAW_ANIM_DELAY 300
+
+#elif defined(BOARD_M5BASIC)
+
+// color TFT
+#define JOYBOARD_TYPE "MB"
+
+#define DISP_ADAFRUIT                                     // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
+#define DISP_COLOR                                        // If defined we assume color display, else assumed mono
+
+// Deep sleep works on this board, but the power manager will shut us down automatically after a while (I think - still TBD)
+#define DEEPSLEEP_INTERVAL (365 * 24 * 60 * 60 * 1000ULL) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
+#define DEEPSLEEP_IDLE (120 * 1000)                       // This this period passes without any activity (button press or message from server), go to sleep
+
+#define TFT_CS 14 // If undefined we assume no TFT screen
+#define TFT_DC 27
+#define TFT_MOSI 23 // VSPI MOSI
+#define TFT_CLK 18  // VSPI CLK
+#define TFT_RST 33
+#define TFT_MISO 19
+#define TFT_LED 32 // backlight
+
+// Button defs for this board
+// FIXME add back GPIO 0/boot as button 4 but only after turning on internal pullup and testing
+#define NUM_BUTTONS 3
+#define BUTTON_GPIOS \
+  {                  \
+    39, 38, 37       \
+  }
+#define FACTORYRESET_BUTTON 39 // one
+#define PANICUPDATE_BUTTON 38  // two
 
 #define DISPLAY_ROTATION 3 // 0 & 2 Portrait. 1 & 3 landscape
 #define DISPLAY_UPDATE     // command needed to flush the display to the actual hardware

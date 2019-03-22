@@ -128,6 +128,13 @@ float t = dht.readTemperature();
 
 # Supported hardware from M5
 
+## M5BASIC display
+
+seems to be using an ILI9342 display - works pretty good now after fixing the adafruit display init
+FIXME - add support for the speaker
+
+## M5STICK micro device
+
 (WIP not yet complete - if you want to help let me know)
 It seems like hte M5STICK should almost work. Still need to fix the display per https://github.com/wonho-maker/Adafruit_SH1106 and https://github.com/rene-mt/esp8266-oled-sh1106
 Example here https://github.com/m5stack/M5Stack/blob/master/examples/Stick/FactoryTest/FactoryTest.ino
