@@ -21,30 +21,44 @@ void camSetup()
 
 // Called from the server to take a new frame
 // we should take the pict and PUT it to the specified URL
-String camSnapshot(String destURL)
+String camSnapshot(String arguments)
 {
     int result = 0;
-    Serial.println("Beginning snapshot");
+    int argsplit = arguments.indexOf(' ');
 
-    cam.run(); // read the next frame (this frame might have been acquired LONG ago, so for now we just discard it and read a new fresh frame)
-    cam.run(); // This frame should reflect recent history
-
-    uint8_t *bytes = cam.getfb();
-    size_t numbytes = cam.getSize();
-    if (bytes && numbytes)
+    if (argsplit <= 0)
     {
-        httpUpload.begin(camUploadClient, destURL);
-        httpUpload.addHeader("Content-Type", "image/jpeg");
-
-        result = httpUpload.PUT(bytes, numbytes);
-        Serial.printf("Frame uploaded, result %d\n", result);
-
-        httpUpload.end();
+        Serial.println("Invalid snapshot arguments");
+        result = -3;
     }
     else
     {
-        Serial.println("FIXME - unexpected null framebuffer");
-        result = -2;
+        String destURL = arguments.substring(0, argsplit);
+        int numFrames = arguments.substring(argsplit + 1).toInt();
+
+        Serial.printf("Beginning snapshot %d\n", numFrames); // FIXME, support multiple frames, by manually stuffing each frame in the PUT see:
+        // https://github.com/espressif/arduino-esp32/blob/master/libraries/HTTPClient/src/HTTPClient.cpp#L509
+
+        cam.run(); // read the next frame (this frame might have been acquired LONG ago, so for now we just discard it and read a new fresh frame)
+        cam.run(); // This frame should reflect recent history
+
+        uint8_t *bytes = cam.getfb();
+        size_t numbytes = cam.getSize();
+        if (bytes && numbytes)
+        {
+            httpUpload.begin(camUploadClient, destURL);
+            httpUpload.addHeader("Content-Type", numFrames > 1 ? "video/x-motion-jpeg" : "image/jpeg");
+
+            result = httpUpload.PUT(bytes, numbytes);
+            Serial.printf("Frame uploaded, result %d\n", result);
+
+            httpUpload.end();
+        }
+        else
+        {
+            Serial.println("FIXME - unexpected null framebuffer");
+            result = -2;
+        }
     }
 
     return String(result);

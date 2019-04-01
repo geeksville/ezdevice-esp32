@@ -6,11 +6,11 @@
 // #define BOARD_TTGO_T5_23 // with a 2.13" screen
 // #define BOARD_TTGO_T5_16_RED // with a red-black 2.9" screen
 // #define BOARD_TTGO_T5_16_YELLOW // with a red-black 2.9" screen
-// #define BOARD_TTGO_T_JOURNAL // camera oled
+#define BOARD_TTGO_T_JOURNAL // camera oled
 // #define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
 // #define BOARD_M5STICK // small oled with button and led
-#define BOARD_M5BASIC // 320x240 TFT with 3 buttons
+// #define BOARD_M5BASIC // 320x240 TFT with 3 buttons
 
 #endif
 
