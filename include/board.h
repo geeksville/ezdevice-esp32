@@ -6,8 +6,8 @@
 // #define BOARD_TTGO_T5_23 // with a 2.13" screen
 // #define BOARD_TTGO_T5_16_RED // with a red-black 2.9" screen
 // #define BOARD_TTGO_T5_16_YELLOW // with a red-black 2.9" screen
-#define BOARD_TTGO_T_JOURNAL // camera oled
-// #define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
+// #define BOARD_TTGO_T_JOURNAL // camera oled
+#define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
 // #define BOARD_M5STICK // small oled with button and led
 // #define BOARD_M5BASIC // 320x240 TFT with 3 buttons
@@ -343,7 +343,7 @@
 
 // #define STATUS_LED 4 // This board has a GPIO hooked to an LED, high is LED on
 
-// #define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
+// #define DISABLE_BROWNOUT // this board draws a bit too much power for the USB spec but if it browns out really is dying 
 
 #define OLED_SDA 21
 #define OLED_SCL 22
