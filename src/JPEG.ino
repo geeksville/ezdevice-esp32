@@ -123,7 +123,7 @@ void jpegRender(int xpos, int ypos)
     }
 
     // after drawing the full frame do the slow eink update
-    DISPLAY_UPDATE;
+    displayUpdate();
 
     // calculate how long it took to draw the image
     drawTime = millis() - drawTime;

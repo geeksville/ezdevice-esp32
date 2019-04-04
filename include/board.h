@@ -45,7 +45,6 @@
 #define PANICUPDATE_BUTTON 37  // two
 
 #define DISPLAY_ROTATION 3 // 0 & 2 Portrait. 1 & 3 landscape
-#define DISPLAY_UPDATE     // command needed to flush the display to the actual hardware
 
 #define BACKGROUND 0x4228 // Background color
 #define FOREGROUND ILI9341_WHITE
@@ -84,7 +83,6 @@
 #define PANICUPDATE_BUTTON 38  // two
 
 #define DISPLAY_ROTATION 3 // 0 & 2 Portrait. 1 & 3 landscape
-#define DISPLAY_UPDATE     // command needed to flush the display to the actual hardware
 
 #define BACKGROUND 0x4228 // Background color
 #define FOREGROUND ILI9341_WHITE
@@ -126,7 +124,6 @@
 // #define PANICUPDATE_BUTTON 38 // one
 
 #define DISPLAY_ROTATION 0            // 0 & 2 Portrait. 1 & 3 landscape
-#define DISPLAY_UPDATE disp.display() // command needed to flush the display to the actual hardware
 
 #define BACKGROUND BLACK // Background color
 #define FOREGROUND WHITE
@@ -169,7 +166,6 @@
 // #define PANICUPDATE_BUTTON 38 // one
 
 #define DISPLAY_ROTATION 0            // 0 & 2 Portrait. 1 & 3 landscape
-#define DISPLAY_UPDATE disp.display() // command needed to flush the display to the actual hardware
 
 #define BACKGROUND BLACK // Background color
 #define FOREGROUND WHITE
@@ -213,16 +209,10 @@
 #define PANICUPDATE_BUTTON 38  // two
 
 #define DISPLAY_ROTATION 1           // 0 & 2 Portrait. 1 & 3 landscape
-#define DISPLAY_UPDATE disp.update() // command needed to flush the display to the actual hardware
 
 #define BACKGROUND GxEPD_WHITE // Background color
 #define FOREGROUND GxEPD_BLACK
 #define ACCENT GxEPD_RED
-
-#define BITMAP_WHITE GxEPD_WHITE
-#define BITMAP_BLACK GxEPD_BLACK
-
-#define DRAW_ANIM_DELAY 0 // This display can't show animations anyways, so just go fast
 
 /*
    The connections to the eInk display do not seem to be listed anywhere,
@@ -317,7 +307,6 @@
 // #define PANICUPDATE_BUTTON 38 // one
 
 #define DISPLAY_ROTATION 0            // 0 & 2 Portrait. 1 & 3 landscape
-#define DISPLAY_UPDATE disp.display() // command needed to flush the display to the actual hardware
 
 #define BACKGROUND BLACK // Background color
 #define FOREGROUND WHITE
@@ -415,16 +404,10 @@
 // #define DEEPSLEEP_CHARGEWAKE (25 * 1000)         // define this if there is a busted charge controller on the board and we need to wake periodically to keep it from killing us.
 
 #define DISPLAY_ROTATION 3           // 0 & 2 Portrait. 1 & 3 landscape
-#define DISPLAY_UPDATE disp.update() // command needed to flush the display to the actual hardware
 
 #define BACKGROUND GxEPD_WHITE // Background color
 #define FOREGROUND GxEPD_BLACK
 #define ACCENT GxEPD_RED
-
-#define BITMAP_WHITE GxEPD_WHITE
-#define BITMAP_BLACK GxEPD_BLACK
-
-#define DRAW_ANIM_DELAY 0 // This display can't show animations anyways, so just go fast
 
 /*
    The connections to the eInk display do not seem to be listed anywhere,
@@ -441,5 +424,15 @@
 #define EPD_CLK 18
 #define EPD_MISO -1 // unused
 #define EPD_DC 17
+
+#endif
+
+// Common config for all eink displays
+#ifdef EPD_CS
+
+#define BITMAP_WHITE GxEPD_WHITE
+#define BITMAP_BLACK GxEPD_BLACK
+
+#define DRAW_ANIM_DELAY 0 // This display can't show animations anyways, so just go fast
 
 #endif

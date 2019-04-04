@@ -36,6 +36,7 @@
 #include "buildnum.h"
 #include <InterruptButtons.h>
 #include <AutoConnect.h>
+#include <rom/rtc.h>
 
 // #include "wifikeys.h"
 #include "board.h"
@@ -204,6 +205,24 @@ const RPCFunctInfo rpcFuncts[] = {
 
 void publish(String suffix, String payload, bool retained);
 
+bool watchdogEnabled;
+void displayUpdate()
+{
+#ifdef EPD_CS
+    // Turn off the watchdog during the very slow eink update - FIXME, change update t ocall feedLoopWDT()
+    if (watchdogEnabled)
+        disableLoopWDT();
+    // the eink display call can take a very long time (8 seconds), so we reset the sleep timer on both sides of the call (for now)
+    delaySleep();
+    disp.update(); // command needed to flush the display to the actual hardware
+    delaySleep();
+    if (watchdogEnabled)
+        enableLoopWDT();
+#endif
+#if defined(OLED_ADDR) || defined(OLED_CS)
+    disp.display(); // command needed to flush the display to the actual hardware
+#endif
+}
 void doDeepSleep()
 {
 #if DEEPSLEEP_INTERVAL
@@ -541,12 +560,7 @@ void showImageNow(ByteStream &stream, bool doUpdate = true)
 #endif
 
     if (doUpdate)
-    {
-        // the eink display call can take a very long time (8 seconds), so we reset the sleep timer on both sides of the call (for now)
-        delaySleep();
-        DISPLAY_UPDATE;
-        delaySleep();
-    }
+        displayUpdate();
 #endif
 }
 
@@ -791,7 +805,7 @@ void showBootScreen(String msg)
     if (!bootImage)
         drawNetworkAnimation();
 
-    DISPLAY_UPDATE;
+    displayUpdate();
 #endif
 }
 
@@ -832,6 +846,8 @@ void setup()
     pinMode(PANICUPDATE_BUTTON, INPUT);
     bool initialUpdateCheck = !digitalRead(PANICUPDATE_BUTTON); // 1 means not pressed
 #endif
+
+    enableCore0WDT(); // WD fail if the system threads die
 
     // Init the filesystem early, because we might need to load a custom boot screen
     if (SPIFFS.begin(true))
@@ -946,6 +962,10 @@ void setup()
 
     delaySleep(); // We will wait to get a message from the server before we go to sleep (hopefully, eventually we will just bail)
     Serial.println("done with setup");
+
+    // From this point on we want our watchdog always running
+    watchdogEnabled = true;
+    enableLoopWDT(); // start user thread watchdog
 }
 
 void epdTest();
@@ -985,9 +1005,23 @@ void buttonCheck()
     static const char *buttonNames[] = {
         "one", "two", "three", "four"}; // we also use a special button name "reset" if the board was just cold booted
 
-    if (isFirstCheck && (wakeCause == ESP_SLEEP_WAKEUP_TIMER || wakeCause == ESP_SLEEP_WAKEUP_UNDEFINED))
-    { // If we booted because our timer ran out or the user pressed reset, send those as fake events
-        const char *reason = (wakeCause == ESP_SLEEP_WAKEUP_TIMER) ? "timeout" : "reset";
+    if (isFirstCheck && !wakeButtons) // if we woke because of a button press, handle that below
+    {
+        // If we booted because our timer ran out or the user pressed reset, send those as fake events
+        const char *reason = "reset"; // our best guess
+        RESET_REASON hwReason = rtc_get_reset_reason(0);
+
+        if (hwReason == RTCWDT_BROWN_OUT_RESET)
+            reason = "brownout";
+
+        if (hwReason == TG0WDT_SYS_RESET)
+            reason = "taskWatchdog";
+
+        if (hwReason == TG1WDT_SYS_RESET)
+            reason = "intWatchdog";
+
+        if (wakeCause == ESP_SLEEP_WAKEUP_TIMER)
+            reason = "timeout";
 
         publish(EVENT_TOPIC, reason);
         delaySleep(); // if someone presses anything, stay alive a little longer
