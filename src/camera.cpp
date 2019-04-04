@@ -15,6 +15,8 @@ void camSetup()
     // there is speculating on the net there is some sort of conflict between i2s interrupts and gpio interrupts, if both on there are problems.
     // For now my fix is to not use interrupts for GPIO detection on boards with cameras.
     // CAM_CONFIG.fb_count = 1; // we don't need the fast DMA version? - it sucks power
+    // CAM_CONFIG.jpeg_quality = 12; // already set at max of 12
+    // CAM_CONFIG.frame_size = FRAMESIZE_XGA; results out of memory for framebuffers even though I have PSRAM.  why?
     int res = cam.init(CAM_CONFIG);
     Serial.printf("Camera init returned %d\n", res);
 }
