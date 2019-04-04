@@ -18,7 +18,6 @@
 #include <ByteStream.h>
 #include <SPI.h>
 #include <Adafruit_GFX.h>
-#include <Bounce2.h>
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 #include <HTTPClient.h>
