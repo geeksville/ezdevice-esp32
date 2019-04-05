@@ -1120,6 +1120,8 @@ void loop()
             if (updateAtMillis && updateAtMillis >= currentMillis)
             {
                 updateAtMillis = 0;
+                if (watchdogEnabled) // Stop watchdog because this operation might take a while
+                    disableLoopWDT();
                 update.update(true); // Force an update to this revision
             }
 
