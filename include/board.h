@@ -7,8 +7,9 @@
 // #define BOARD_TTGO_T5_16_RED // with a red-black 2.9" screen
 // #define BOARD_TTGO_T5_16_YELLOW // with a red-black 2.9" screen
 // #define BOARD_TTGO_T_JOURNAL // camera oled
-#define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
+// #define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
+#define BOARD_TTGO_GROW // TTGO tem/humidity/plant sensor board
 // #define BOARD_M5STICK // small oled with button and led
 // #define BOARD_M5BASIC // 320x240 TFT with 3 buttons
 
@@ -23,7 +24,8 @@
 #define DISP_COLOR    // If defined we assume color display, else assumed mono
 
 // Deep sleep works on this board, but the power manager will shut us down automatically after a while (I think - still TBD)
-#define DEEPSLEEP_INTERVAL (365 * 24 * 60 * 60 * 1000ULL) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
+// but the TFT screen basically needs USB power to be useful, so don't sleep long
+#define DEEPSLEEP_INTERVAL (60 * 60 * 1000ULL) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
 #define DEEPSLEEP_IDLE (120 * 1000)                       // This this period passes without any activity (button press or message from server), go to sleep
 
 #define TFT_CS 27 // If undefined we assume no TFT screen
@@ -133,6 +135,29 @@
 #define BITMAP_BLACK WHITE
 
 #define DRAW_ANIM_DELAY 300
+
+#elif defined(BOARD_TTGO_GROW)
+
+#define JOYBOARD_TYPE "JG"
+
+// deep sleep works well on this board?
+#define DEEPSLEEP_INTERVAL (24 * 60 * 60 * 1000) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
+#define DEEPSLEEP_IDLE (30 * 1000)               // This this period passes without any activity (button press or message from server), go to sleep
+
+// #define STATUS_LED 16 // This board has a GPIO hooked to an LED, high is LED on
+
+#define DISABLE_WATCHDOG // possibly busted on this rev of the CPU?
+#define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
+// #define DISABLE_SPIFFS // this CPU is not properly partitioned from the ttgo factory, so don't use FFS for now
+
+// Button defs for this board
+#define NUM_BUTTONS 0
+#define BUTTON_GPIOS \
+  {                  \
+  /* 0   */             \
+  } // 0 is boot, 2 is en but hardwired to reset on the board
+// #define FACTORYRESET_BUTTON 39 // three
+// #define PANICUPDATE_BUTTON 38 // one
 
 #elif defined(BOARD_M5STICK)
 

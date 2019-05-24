@@ -846,8 +846,11 @@ void setup()
     bool initialUpdateCheck = !digitalRead(PANICUPDATE_BUTTON); // 1 means not pressed
 #endif
 
+#ifndef DISABLE_WATCHDOG
     enableCore0WDT(); // WD fail if the system threads die
+#endif 
 
+#ifndef DISABLE_SPIFFS
     // Init the filesystem early, because we might need to load a custom boot screen
     if (SPIFFS.begin(true))
     {
@@ -873,6 +876,7 @@ void setup()
             file = root.openNextFile();
         }
     }
+#endif
 
 #if 0
     Serial.println("Begin display test");
@@ -962,9 +966,11 @@ void setup()
     delaySleep(); // We will wait to get a message from the server before we go to sleep (hopefully, eventually we will just bail)
     Serial.println("done with setup");
 
+#ifndef DISABLE_WATCHDOG
     // From this point on we want our watchdog always running
     watchdogEnabled = true;
     enableLoopWDT(); // start user thread watchdog
+#endif
 }
 
 void epdTest();
