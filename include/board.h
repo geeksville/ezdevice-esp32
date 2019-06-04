@@ -141,20 +141,20 @@
 #define JOYBOARD_TYPE "JG"
 
 // deep sleep works well on this board?
-#define DEEPSLEEP_INTERVAL (24 * 60 * 60 * 1000) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
+#define DEEPSLEEP_INTERVAL (1 * 60 * 60 * 1000)  // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
 #define DEEPSLEEP_IDLE (30 * 1000)               // This this period passes without any activity (button press or message from server), go to sleep
 
 // #define STATUS_LED 16 // This board has a GPIO hooked to an LED, high is LED on
 
 #define DISABLE_WATCHDOG // possibly busted on this rev of the CPU?
-#define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
+// #define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
 // #define DISABLE_SPIFFS // this CPU is not properly partitioned from the ttgo factory, so don't use FFS for now
 
 // Button defs for this board
 #define NUM_BUTTONS 0
 #define BUTTON_GPIOS \
   {                  \
-  /* 0   */             \
+  /* 0 */                \
   } // 0 is boot, 2 is en but hardwired to reset on the board
 // #define FACTORYRESET_BUTTON 39 // three
 // #define PANICUPDATE_BUTTON 38 // one

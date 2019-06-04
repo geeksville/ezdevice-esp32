@@ -267,7 +267,8 @@ void doDeepSleep()
     uint64_t gpioMask = 0;
 
     // FIXME change polarity so we can wake on ANY_HIGH instead - that would allow us to use all three buttons (instead of just the first)
-    for (int i = 0; i < 1 /* sizeof(buttons.gpios) */; i++)
+    int numWakeButtons = sizeof(buttons.gpios) ? 1 : 0; // for the time being we support a max of one wake button
+    for (int i = 0; i < numWakeButtons; i++)
     {
         gpio_num_t wakeGpio = (gpio_num_t)buttons.gpios[i];
 
@@ -279,7 +280,9 @@ void doDeepSleep()
     }
 
     // FIXME wakes too quickly
-    esp_sleep_enable_ext1_wakeup(gpioMask, ESP_EXT1_WAKEUP_ALL_LOW);
+    if(gpioMask)
+        esp_sleep_enable_ext1_wakeup(gpioMask, ESP_EXT1_WAKEUP_ALL_LOW);
+
     esp_sleep_enable_timer_wakeup(msecToWake * 1000ULL); // call expects usecs
     esp_deep_sleep_start();                              // 0.25 mA sleep current (battery)
 #else
@@ -713,7 +716,7 @@ bool reconnect()
     // we send status offline as our will (as a persistent message)
     if (mqtt.connect(clientId, "joyclient", "apes4cats", getTopic("status"), 1, true, "offline"))
     {
-        Serial.printf("Connected to MQTT server, wifi=%s", WiFi.SSID().c_str());
+        Serial.printf("Connected to MQTT server, wifi=%s\n", WiFi.SSID().c_str());
         delaySleep(); // we just made some forward progress (note, we don't do this just because we _tried_ to connect)
 
         static char subsStr[64]; /* We keep this static because the mqtt lib
@@ -839,7 +842,6 @@ void setup()
     dump_partitions();
 
     delaySleep(); // Give a few seconds to try and get an internet connection
-    Serial.println("joining wifi");
 
 #ifdef PANICUPDATE_BUTTON
     pinMode(PANICUPDATE_BUTTON, INPUT);
@@ -876,6 +878,9 @@ void setup()
             file = root.openNextFile();
         }
     }
+    else {
+        Serial.println("SPIFFS mount failed!");
+    }
 #endif
 
 #if 0
@@ -885,6 +890,7 @@ void setup()
     Serial.println("End display test");
 #endif
 
+    Serial.println("joining wifi");
     AutoConnectCredential ac(portalConfig.boundaryOffset);
 
 #ifdef FACTORYRESET_BUTTON
