@@ -49,3 +49,27 @@ public:
 protected:
     virtual String getValueStr(); 
 };
+
+class BMETempSource : public PushSource {
+public:
+    BMETempSource() : PushSource("Tamb") {}   
+
+protected:
+    virtual String getValueStr(); 
+};
+
+class BMEHumiditySource : public PushSource {
+public:
+    BMEHumiditySource() : PushSource("Hum") {}   
+
+protected:
+    virtual String getValueStr(); 
+};
+
+class BMEPressureSource : public PushSource {
+public:
+    BMEPressureSource() : PushSource("hPa") {}   
+
+protected:
+    virtual String getValueStr(); 
+};

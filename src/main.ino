@@ -47,6 +47,10 @@
 #include <DHT.h>
 #endif
 
+#ifdef BME280_ADDR
+#include <Adafruit_BME280.h>
+#endif 
+
 // nasty magic to stringify a numeric macro
 #define xstr(s) str(s)
 #define str(s) #s
@@ -164,6 +168,26 @@ String DHTHumiditySource::getValueStr()
     String valStr = String(val);
 
     return valStr;
+}
+
+#endif
+
+#ifdef BME280_ADDR
+Adafruit_BME280 bme;
+
+String BMETempSource::getValueStr()
+{
+    return String(bme.readTemperature());
+}
+
+String BMEHumiditySource::getValueStr()
+{
+    return String(bme.readHumidity());
+}
+
+String BMEPressureSource::getValueStr()
+{
+    return String(bme.readPressure() / 100.0f); // return hPa
 }
 
 #endif
@@ -365,7 +389,6 @@ void turnOnDisplay()
 
 #ifdef DISP_ADAFRUIT
 #ifdef OLED_ADDR
-    Wire.begin(OLED_SDA, OLED_SCL);
     // datasheet says max clock rate of 2.5us per pulse
     Wire.setClock(400000);
 
@@ -902,6 +925,11 @@ void setup()
     }
 #endif
 
+#ifdef I2C_SDA
+    // If this board is using I2C
+    Wire.begin(I2C_SDA, I2C_SCL);
+#endif 
+
 #if 0
     Serial.println("Begin display test");
     turnOnDisplay();
@@ -990,6 +1018,11 @@ void setup()
 
 #ifdef DHT_TYPE
     dht.begin();
+#endif
+
+#ifdef BME280_ADDR
+    if(!bme.begin(BME280_ADDR, &Wire))
+        Serial.println("Error: No BME280 found");
 #endif
 
     delaySleep(); // We will wait to get a message from the server before we go to sleep (hopefully, eventually we will just bail)

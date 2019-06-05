@@ -7,9 +7,9 @@
 // #define BOARD_TTGO_T5_16_RED // with a red-black 2.9" screen
 // #define BOARD_TTGO_T5_16_YELLOW // with a red-black 2.9" screen
 // #define BOARD_TTGO_T_JOURNAL // camera oled
-// #define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
+#define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
-#define BOARD_TTGO_GROW // TTGO tem/humidity/plant sensor board
+// #define BOARD_TTGO_GROW // TTGO tem/humidity/plant sensor board
 // #define BOARD_M5STICK // small oled with button and led
 // #define BOARD_M5BASIC // 320x240 TFT with 3 buttons
 
@@ -107,8 +107,8 @@
 
 #define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
 
-#define OLED_SDA 5
-#define OLED_SCL 4
+#define I2C_SDA 5
+#define I2C_SCL 4
 #define OLED_ADDR 0x3c // i2c addr
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 #define OLED_RESET -1  // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -322,8 +322,8 @@
 
 // #define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
 
-#define OLED_SDA 14
-#define OLED_SCL 13
+#define I2C_SDA 14
+#define I2C_SCL 13
 #define OLED_ADDR 0x3c // i2c addr
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 #define OLED_RESET -1  // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -360,19 +360,22 @@
 #define DISP_ADAFRUIT // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
 // #define DISP_COLOR // If defined we assume color display, else assumed mono
 
-// deep sleep works well on this board, but the sleep current draw is 10mA due to something buzzing on the board (regulator?)
-//#define DEEPSLEEP_INTERVAL (24 * 60 * 60 * 1000) // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
-//#define DEEPSLEEP_IDLE (30 * 1000)               // This this period passes without any activity (button press or message from server), go to sleep
+#define DISABLE_WATCHDOG // possibly busted on this rev of the CPU?
+
+// camera code leaks memory due to heap misalignment (FIXME), so for the time being we force a brief sleep/reboot every day
+#define FORCEREBOOT_INTERVAL (24 * 60 * 60 * 1000) 
 
 // #define STATUS_LED 4 // This board has a GPIO hooked to an LED, high is LED on
 
 // #define DISABLE_BROWNOUT // this board draws a bit too much power for the USB spec but if it browns out really is dying 
 
-#define OLED_SDA 21
-#define OLED_SCL 22
+#define I2C_SDA 21
+#define I2C_SCL 22
 #define OLED_ADDR 0x3c // i2c addr
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 #define OLED_RESET -1  // Reset pin # (or -1 if sharing Arduino reset pin)
+
+#define BME280_ADDR 0X77
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -385,6 +388,14 @@
   }
 #define FACTORYRESET_BUTTON 34 // one
 // #define PANICUPDATE_BUTTON 38 // one
+
+// Various datasources to poll perodically and upload to our server
+#define PUSH_SOURCES          \
+  {                           \
+      new BMETempSource(),    \
+      new BMEHumiditySource(), \
+      new BMEPressureSource() \
+  }
 
 #define DISPLAY_ROTATION 2            // 0 & 2 Portrait. 1 & 3 landscape
 #define DISPLAY_UPDATE disp.display() // command needed to flush the display to the actual hardware
