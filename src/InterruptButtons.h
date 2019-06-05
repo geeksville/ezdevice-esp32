@@ -15,6 +15,13 @@ public:
   // FIXME shouldn't really be public
   const uint8_t gpios[NUM_BUTTONS] = BUTTON_GPIOS; // FIXME - ugly init
 
+#ifdef BUTTON_ACTIVEHIGH
+  const bool isActiveHigh[NUM_BUTTONS] = BUTTON_ACTIVEHIGH; // FIXME - ugly init
+#else
+  const bool isActiveHigh[NUM_BUTTONS] = { 0 }; // C++ spec sayz all arry will be zero
+#endif
+
+
   void setup(bool useInterrupts = true); // Call to attach to each of the GPIOs
   bool anyPressed();                     // any unhandled buttons? (note: calling this function does not mark the buttons has handled)
 

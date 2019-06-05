@@ -380,12 +380,22 @@
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
-// Button defs for this board
-#define NUM_BUTTONS 1
+// Button defs for this board (PIR sensor is hooked to gpio 33)
+#define NUM_BUTTONS 2
 #define BUTTON_GPIOS \
   {                  \
-    34               \
+    34, 33           \
   }
+
+// Define which buttons are active high vs low (optional def)
+#define BUTTON_ACTIVEHIGH \
+  { \
+    false, true \
+  }
+
+// Quick hack to make motion sensor kinda work, treat all buttons with a very long debounce and handle it as a button
+#define DEBOUNCE_MS 10000
+
 #define FACTORYRESET_BUTTON 34 // one
 // #define PANICUPDATE_BUTTON 38 // one
 

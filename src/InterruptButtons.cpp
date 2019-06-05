@@ -6,7 +6,9 @@ A quick/minimal ISR based button handler
 
 InterruptButtons buttons;
 
+#ifndef DEBOUNCE_MS 
 #define DEBOUNCE_MS 200
+#endif
 
 void IRAM_ATTR InterruptButtons::isr()
 {
@@ -16,7 +18,11 @@ void IRAM_ATTR InterruptButtons::isr()
     // FIXME - this reading the GPIOs is kinda ugly, better to instead check why our ISR got invoked...
     for (int i = 0; i < NUM_BUTTONS; i++)
     {
-        if (!digitalRead(_this.gpios[i])) // active low
+        bool val = digitalRead(_this.gpios[i]);
+        if(!_this.isActiveHigh[i])
+            val = !val;
+
+        if (val) // pressed
             if (_this.pressMillis[i] == 0 || now >= _this.pressMillis[i] + DEBOUNCE_MS || now < _this.pressMillis[i])
             { // ignore bounces but be careful about when time rolls over
                 _this.pressMillis[i] = now;
@@ -36,8 +42,12 @@ void InterruptButtons::setup(bool _useInterrupts)
 
         pinMode(gpios[i], INPUT);
 
-        // Check if the button is _already_ pressed (we assume active low)
-        if (!digitalRead(gpios[i]))
+        // Check if the button is _already_ pressed 
+        bool val = digitalRead(gpios[i]);
+        if(!isActiveHigh[i])
+            val = !val;
+
+        if (val)
         {
             pressed[i] = true;
             pressMillis[i] = now;
@@ -50,7 +60,7 @@ void InterruptButtons::setup(bool _useInterrupts)
 
         // Set motionSensor pin as interrupt, assign interrupt function
         if (useInterrupts)
-            attachInterrupt(digitalPinToInterrupt(gpios[i]), isr, FALLING);
+            attachInterrupt(digitalPinToInterrupt(gpios[i]), isr, isActiveHigh[i] ? RISING : FALLING);
     }
 }
 
