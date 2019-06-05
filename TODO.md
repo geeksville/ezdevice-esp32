@@ -1,4 +1,4 @@
-## Use PWM to control the LED brightness for the backlight LED
+## Use PWM to control the LED brightness for the display backlight LED
 
 Something like:
 // Init the back-light LED PWM
