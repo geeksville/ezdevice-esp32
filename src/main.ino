@@ -32,6 +32,7 @@
 #include "driver/rtc_io.h"
 #include "FS.h"
 #include "SPIFFS.h"
+#include "service.h"
 #include "buildnum.h"
 #include <InterruptButtons.h>
 #include <AutoConnect.h>
@@ -40,6 +41,11 @@
 // #include "wifikeys.h"
 #include "board.h"
 #include "camera.h"
+#include "PushSource.h"
+
+#ifdef DHT_TYPE
+#include <DHT.h>
+#endif
 
 // nasty magic to stringify a numeric macro
 #define xstr(s) str(s)
@@ -140,21 +146,35 @@ GxGDEW029Z10 disp(epaperIO, EPD_RESET, EPD_BUSY);
 
 #endif
 
-// Sources for periodic publishes of device state.
-// Initially assume an analog input
-// FIXME: generalize via inheritence to allow other input types or use a virtual function to read special value types
-struct PushSource
+#ifdef DHT_TYPE
+// Initialize DHT sensor.
+DHT dht(DHT_PIN, DHT_TYPE);
+
+String DHTTempSource::getValueStr()
 {
-    const char *name; // source will be published with this identifier
-    int gpioNum;
-    float scaling; // Used to prescale the read value before uploading
-    float offset;  // uploaded value is rawValue * scale + offset
-};
+    float val = dht.readTemperature();
+    String valStr = String(val);
+
+    return valStr;
+}
+
+String DHTHumiditySource::getValueStr()
+{
+    float val = dht.readHumidity();
+    String valStr = String(val);
+
+    return valStr;
+}
+
+#endif
+
+
+
 
 #ifdef PUSH_SOURCES
-const PushSource pushSources[] = PUSH_SOURCES;
+PushSource *pushSources[] = PUSH_SOURCES;
 #else
-const PushSource pushSources[] = {};
+PushSource *pushSources[] = {};
 #endif
 
 #define EVENT_TOPIC "event" // was "press"
@@ -202,7 +222,6 @@ const RPCFunctInfo rpcFuncts[] = {
 #endif
     {NULL, NULL}};
 
-void publish(String suffix, String payload, bool retained);
 
 bool watchdogEnabled;
 void displayUpdate()
@@ -446,7 +465,7 @@ const char *getTopic(String suffix, const char *direction = "dev")
     return buf;
 }
 
-void publish(String suffix, String payload, bool retained = false)
+void publish(String suffix, String payload, bool retained)
 {
     printf("publish %s = %s\n", suffix.c_str(), payload.c_str());
 
@@ -839,7 +858,7 @@ void setup()
 
     initClientId();
 
-    dump_partitions();
+    //dump_partitions();
 
     delaySleep(); // Give a few seconds to try and get an internet connection
 
@@ -969,6 +988,10 @@ void setup()
     buttons.setup(true);
 #endif
 
+#ifdef DHT_TYPE
+    dht.begin();
+#endif
+
     delaySleep(); // We will wait to get a message from the server before we go to sleep (hopefully, eventually we will just bail)
     Serial.println("done with setup");
 
@@ -991,16 +1014,9 @@ void sendPushSources()
         int numSources = sizeof(pushSources) / sizeof(pushSources[0]);
         for (int i = 0; i < numSources; i++)
         {
-            const PushSource &s = pushSources[i];
+            PushSource *s = pushSources[i];
 
-            String topic("push/");
-            topic += s.name;
-
-            int raw = analogRead(s.gpioNum);
-            float val = raw * s.scaling + s.offset;
-            String valStr = String(val);
-
-            publish(topic, valStr);
+            s->doPublish();
         }
 
         isFirstCheck = false;

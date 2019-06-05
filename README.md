@@ -115,16 +115,7 @@ I haven't tried it but
 ## TTGO HiGrow
 
 ID code G
-code not written yet - FIXME see https://github.com/LilyGO/higrowopen/blob/master/HiGrowEsp32/HiGrowEsp32.ino
-analogRead(32) for the conductive sensor
-#define DHTTYPE DHT11 // DHT 22 (AM2302), AM2321
-const int DHTPin = 22;
-// Initialize DHT sensor.
-DHT dht(DHTPin, DHTTYPE);
-// Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-float h = dht.readHumidity();
-// Read temperature as Celsius (the default)
-float t = dht.readTemperature();
+Periodically publishes humidity, temperature and soil conductivity to server.
 
 # Supported hardware from M5
 

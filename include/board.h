@@ -150,6 +150,9 @@
 // #define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
 // #define DISABLE_SPIFFS // this CPU is not properly partitioned from the ttgo factory, so don't use FFS for now
 
+#define DHT_TYPE DHT11 // temperature/humidity sensor
+#define DHT_PIN 22
+
 // Button defs for this board
 #define NUM_BUTTONS 0
 #define BUTTON_GPIOS \
@@ -158,6 +161,14 @@
   } // 0 is boot, 2 is en but hardwired to reset on the board
 // #define FACTORYRESET_BUTTON 39 // three
 // #define PANICUPDATE_BUTTON 38 // one
+
+// Various datasources to poll perodically and upload to our server
+#define PUSH_SOURCES         \
+  {                          \
+      new DHTTempSource(), \
+      new DHTHumiditySource(), \
+      new AnalogPushSource("Cond", 32, 1.0f, 0.0f) \
+  }
 
 #elif defined(BOARD_M5STICK)
 
@@ -281,9 +292,7 @@
 // Various datasources to poll perodically and upload to our server
 #define PUSH_SOURCES         \
   {                          \
-    {                        \
-      "Vbat", 35, 1.0f, 0.0f \
-    }                        \
+      new AnalogPushSource("Vbat", 35, 1.0f, 0.0f) \
   }
 
 #elif defined(BOARD_TTGO_T5_16_RED)
