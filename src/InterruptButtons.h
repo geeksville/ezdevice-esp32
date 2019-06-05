@@ -16,9 +16,9 @@ public:
   const uint8_t gpios[NUM_BUTTONS] = BUTTON_GPIOS; // FIXME - ugly init
 
 #ifdef BUTTON_ACTIVEHIGH
-  const bool isActiveHigh[NUM_BUTTONS] = BUTTON_ACTIVEHIGH; // FIXME - ugly init
+  bool isActiveHigh[NUM_BUTTONS] = BUTTON_ACTIVEHIGH; // FIXME - ugly init
 #else
-  const bool isActiveHigh[NUM_BUTTONS] = { 0 }; // C++ spec sayz all arry will be zero
+  bool isActiveHigh[NUM_BUTTONS]; // C++ spec sayz all arry will be zero
 #endif
 
 
