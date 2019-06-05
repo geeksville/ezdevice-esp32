@@ -146,7 +146,7 @@
 
 // #define STATUS_LED 16 // This board has a GPIO hooked to an LED, high is LED on
 
-#define DISABLE_WATCHDOG // possibly busted on this rev of the CPU?
+// #define DISABLE_WATCHDOG // possibly busted on this rev of the CPU?
 // #define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
 // #define DISABLE_SPIFFS // this CPU is not properly partitioned from the ttgo factory, so don't use FFS for now
 
@@ -360,7 +360,8 @@
 #define DISP_ADAFRUIT // If defined we assume either TFT or OLED which can be drawn with the regular adafruit draw operations
 // #define DISP_COLOR // If defined we assume color display, else assumed mono
 
-#define DISABLE_WATCHDOG // possibly busted on this rev of the CPU?
+// #define DISABLE_BROWNOUT 
+// #define DISABLE_WATCHDOG // possibly busted on this rev of the CPU?
 
 // camera code leaks memory due to heap misalignment (FIXME), so for the time being we force a brief sleep/reboot every day
 #define FORCEREBOOT_INTERVAL (24 * 60 * 60 * 1000) 

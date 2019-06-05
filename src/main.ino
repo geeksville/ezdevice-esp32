@@ -891,7 +891,8 @@ void setup()
 #endif
 
 #ifndef DISABLE_WATCHDOG
-    enableCore0WDT(); // WD fail if the system threads die
+    // Doesn't seem to work
+    // enableCore0WDT(); // WD fail if the system threads die
 #endif 
 
 #ifndef DISABLE_SPIFFS
