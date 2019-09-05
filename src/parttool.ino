@@ -3,6 +3,7 @@
 #include "esp_partition.h"
 #include "esp_ota_ops.h"
 
+#if 0
 void dump_part(const esp_partition_t *p)
 {
     printf("type %d, subtype %d, address %x, label %s\n", p->type, p->subtype, p->address, p->label);
@@ -85,3 +86,4 @@ void dump_partitions()
        sha256: 9bc6592295ad5b158db06e2662df7a9cb4788b3b9e0527092d7bb12760b191b4
      */
 }
+#endif

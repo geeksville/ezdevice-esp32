@@ -7,9 +7,9 @@
 // #define BOARD_TTGO_T5_16_RED // with a red-black 2.9" screen
 // #define BOARD_TTGO_T5_16_YELLOW // with a red-black 2.9" screen
 // #define BOARD_TTGO_T_JOURNAL // camera oled
-// #define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
+#define BOARD_TTGO_CAMERA // camera with oled, bme280 and motion sensor
 // #define BOARD_TTGO_O // what I'm calling their TTGO oled board with a battery
-#define BOARD_TTGO_GROW // TTGO tem/humidity/plant sensor board
+// #define BOARD_TTGO_GROW // TTGO tem/humidity/plant sensor board
 // #define BOARD_M5STICK // small oled with button and led
 // #define BOARD_M5BASIC // 320x240 TFT with 3 buttons
 
@@ -141,13 +141,13 @@
 #define JOYBOARD_TYPE "JG"
 
 // deep sleep works well on this board?
-#define DEEPSLEEP_INTERVAL (1 * 60 * 60 * 1000)  // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
+#define DEEPSLEEP_INTERVAL (15 * 60 * 1000)  // sleep after we've received one message from the server (or we ran out of time), sleep for this many msecs
 #define DEEPSLEEP_IDLE (15 * 1000)               // This this period passes without any activity (button press or message from server), go to sleep
 
 #define STATUS_LED 16 // This board has a GPIO hooked to an LED, high is LED on
 
 // #define DISABLE_WATCHDOG // possibly busted on this rev of the CPU?
-// #define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
+#define DISABLE_BROWNOUT // this board is powered by a battery with low voltage
 // #define DISABLE_SPIFFS // this CPU is not properly partitioned from the ttgo factory, so don't use FFS for now
 
 #define DHT_TYPE DHT11 // temperature/humidity sensor
@@ -167,7 +167,7 @@
   {                          \
       new DHTTempSource(), \
       new DHTHumiditySource(), \
-      new AnalogPushSource("Cond", 32, 1.0f, 0.0f) \
+      new AnalogPushSource("Soil", 32, 1.0f, 0.0f) \
   }
 
 #elif defined(BOARD_M5STICK)

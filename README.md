@@ -109,8 +109,7 @@ Same as TTGO T4
 
 ## TTGO-Camera
 
-This board looks interesting: https://github.com/LilyGO/esp32-camera-bme280
-I haven't tried it but
+Now supported: https://github.com/LilyGO/esp32-camera-bme280
 
 ## TTGO HiGrow
 
