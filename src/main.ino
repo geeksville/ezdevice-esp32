@@ -30,6 +30,7 @@
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 #include "driver/rtc_io.h"
+#include "esp_partition.h"
 #include "FS.h"
 #include "SPIFFS.h"
 #include "service.h"
